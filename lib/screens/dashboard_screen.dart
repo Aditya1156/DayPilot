@@ -8,7 +8,6 @@ import 'package:daypilot/widgets/circular_timeline.dart';
 import 'package:daypilot/widgets/task_card.dart';
 import 'package:daypilot/widgets/ai_suggestion_card.dart';
 import 'package:daypilot/widgets/app_drawer.dart';
-import 'package:daypilot/widgets/user_profile_menu.dart';
 import 'package:daypilot/widgets/motivational_quote_card.dart';
 import 'package:daypilot/widgets/task_search_delegate.dart';
 import 'package:daypilot/services/haptic_service.dart';
@@ -119,7 +118,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     );
                   },
                 ),
-                const UserProfileMenu(),
+                // Profile moved into the left sidebar drawer for cleaner header
               ],
             ),
 

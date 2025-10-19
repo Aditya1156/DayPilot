@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:daypilot/utils/theme.dart';
 import 'package:daypilot/providers/user_profile_provider.dart';
+import 'package:daypilot/widgets/user_profile_menu.dart';
 
 class AppDrawer extends ConsumerWidget {
   const AppDrawer({super.key});
@@ -31,19 +32,17 @@ class AppDrawer extends ConsumerWidget {
                 padding: const EdgeInsets.all(24.0),
                 child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: AppTheme.primaryBlue,
-                      child: const Icon(
-                        Icons.person,
-                        size: 40,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
+                    // Use the same UserProfileMenu control inside the drawer header so profile actions
+                    // are bound to the left sidebar instead of the top-right header.
                     userProfileAsync.when(
                       data: (profile) => Column(
                         children: [
+                          // Small padding around the profile menu so it looks like an avatar in header
+                          Align(
+                            alignment: Alignment.center,
+                            child: UserProfileMenu(),
+                          ),
+                          const SizedBox(height: 12),
                           Text(
                             profile?.username ?? 'User',
                             style: theme.textTheme.titleLarge?.copyWith(
@@ -60,33 +59,50 @@ class AppDrawer extends ConsumerWidget {
                       ),
                       loading: () => Column(
                         children: [
+                          // Show a loading avatar
+                          Align(
+                            alignment: Alignment.center,
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              child: CircleAvatar(
+                                radius: 40,
+                                backgroundColor: Colors.grey[300],
+                                child: const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(strokeWidth: 2.5),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
                           Text(
                             'Loading...',
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.7),
-                            ),
-                          ),
                         ],
                       ),
                       error: (_, __) => Column(
                         children: [
+                          Align(
+                            alignment: Alignment.center,
+                            child: CircleAvatar(
+                              radius: 40,
+                              backgroundColor: AppTheme.primaryBlue,
+                              child: const Icon(
+                                Icons.person,
+                                size: 40,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
                           Text(
                             'User',
                             style: theme.textTheme.titleLarge?.copyWith(
                               fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            '',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.7),
                             ),
                           ),
                         ],
