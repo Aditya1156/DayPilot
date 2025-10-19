@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Card displaying motivational quotes and productivity tips
 class MotivationalQuoteCard extends StatefulWidget {
@@ -11,6 +12,7 @@ class MotivationalQuoteCard extends StatefulWidget {
 
 class _MotivationalQuoteCardState extends State<MotivationalQuoteCard> {
   late Map<String, String> currentQuote;
+  bool _isVisible = true;
 
   final List<Map<String, String>> quotes = [
     {
@@ -59,6 +61,22 @@ class _MotivationalQuoteCardState extends State<MotivationalQuoteCard> {
   void initState() {
     super.initState();
     _selectRandomQuote();
+    _loadVisibility();
+  }
+
+  Future<void> _loadVisibility() async {
+    final prefs = await SharedPreferences.getInstance();
+    final visible = prefs.getBool('quote_visible') ?? true;
+    if (mounted) {
+      setState(() {
+        _isVisible = visible;
+      });
+    }
+  }
+
+  Future<void> _saveVisibility(bool visible) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('quote_visible', visible);
   }
 
   void _selectRandomQuote() {
@@ -68,86 +86,124 @@ class _MotivationalQuoteCardState extends State<MotivationalQuoteCard> {
     });
   }
 
+  void _dismissCard() {
+    setState(() {
+      _isVisible = false;
+    });
+    _saveVisibility(false);
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!_isVisible) return const SizedBox.shrink();
+
     final theme = Theme.of(context);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            theme.colorScheme.primaryContainer,
-            theme.colorScheme.secondaryContainer,
+            theme.colorScheme.primary.withOpacity(0.1),
+            theme.colorScheme.secondary.withOpacity(0.05),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.primary.withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
-          onTap: _selectRandomQuote,
-          borderRadius: BorderRadius.circular(16),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Quote icon
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.lightbulb_outline,
+                  color: theme.colorScheme.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Quote content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.format_quote,
-                      color: theme.colorScheme.onPrimaryContainer,
-                      size: 32,
+                    Row(
+                      children: [
+                        Text(
+                          'Daily Inspiration',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: theme.colorScheme.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const Spacer(),
+                        // Refresh button
+                        InkWell(
+                          onTap: _selectRandomQuote,
+                          borderRadius: BorderRadius.circular(4),
+                          child: Padding(
+                            padding: const EdgeInsets.all(4),
+                            child: Icon(
+                              Icons.refresh,
+                              size: 16,
+                              color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(height: 6),
                     Text(
-                      'Daily Inspiration',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: theme.colorScheme.onPrimaryContainer,
-                        fontWeight: FontWeight.bold,
+                      '"${currentQuote['quote'] ?? ''}"',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.8),
+                        height: 1.4,
+                        fontStyle: FontStyle.italic,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.refresh),
-                      color: theme.colorScheme.onPrimaryContainer,
-                      onPressed: _selectRandomQuote,
-                      tooltip: 'New quote',
+                    const SizedBox(height: 4),
+                    Text(
+                      '— ${currentQuote['author'] ?? ''}',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  currentQuote['quote'] ?? '',
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onPrimaryContainer,
-                    fontStyle: FontStyle.italic,
-                    height: 1.5,
+              ),
+              const SizedBox(width: 8),
+              // Close button
+              InkWell(
+                onTap: _dismissCard,
+                borderRadius: BorderRadius.circular(4),
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Icon(
+                    Icons.close,
+                    size: 16,
+                    color: theme.colorScheme.onSurface.withOpacity(0.4),
                   ),
                 ),
-                const SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Text(
-                    '— ${currentQuote['author'] ?? ''}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onPrimaryContainer.withOpacity(0.8),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

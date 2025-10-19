@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -101,46 +102,65 @@ class _AuthWrapperState extends State<AuthWrapper> {
   bool? _onboardingComplete;
   User? _currentUser;
   bool? _usernameSetupComplete;
+  StreamSubscription<User?>? _authSubscription;
 
   @override
   void initState() {
     super.initState();
     _checkOnboarding();
     // Listen to auth state changes
-    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+    _authSubscription = FirebaseAuth.instance.authStateChanges().listen((User? user) async {
       print('🔄 Auth state changed: ${user?.uid ?? 'null'}');
+      if (!mounted) return; // Check if widget is still mounted
+      
       if (user != null) {
         // User logged in - add small delay to ensure SharedPreferences is saved
         await Future.delayed(const Duration(milliseconds: 100));
+        if (!mounted) return; // Check again after async operation
+        
         // Check username setup
         await _checkUsernameSetup();
         print('👤 Username setup check complete: $_usernameSetupComplete');
       } else {
         // User logged out - reset username state
-        setState(() {
-          _usernameSetupComplete = null;
-        });
+        if (mounted) {
+          setState(() {
+            _usernameSetupComplete = null;
+          });
+        }
       }
       // Update user state AFTER checking username setup
-      setState(() {
-        _currentUser = user;
-      });
-      print('✅ Auth state update complete - User: ${user?.uid ?? 'null'}, Setup: $_usernameSetupComplete');
+      if (mounted) {
+        setState(() {
+          _currentUser = user;
+        });
+        print('✅ Auth state update complete - User: ${user?.uid ?? 'null'}, Setup: $_usernameSetupComplete');
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _checkOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
-    });
+    if (mounted) {
+      setState(() {
+        _onboardingComplete = prefs.getBool('onboarding_complete') ?? false;
+      });
+    }
   }
 
   Future<void> _checkUsernameSetup() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _usernameSetupComplete = prefs.getBool('username_setup_complete') ?? false;
-    });
+    if (mounted) {
+      setState(() {
+        _usernameSetupComplete = prefs.getBool('username_setup_complete') ?? false;
+      });
+    }
   }
 
   bool _isFirebaseAvailable() {

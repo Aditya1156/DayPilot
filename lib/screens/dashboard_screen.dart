@@ -130,9 +130,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Motivational Quote Card
+                    // Motivational Quote Card - Now smaller and dismissible
                     const MotivationalQuoteCard(),
-                    const SizedBox(height: 16),
 
                     // Circular Timeline
                     Center(
@@ -141,7 +140,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                         progress: progress,
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
 
                     // Morning Section
                     _buildTimeSection(
