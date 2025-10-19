@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "709481313590",
+    "project_id": "pesitm-connect",
+    "storage_bucket": "pesitm-connect.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:709481313590:android:39724d1221b7cc9a8faf97",
+        "android_client_info": {
+          "package_name": "com.daypilot.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDaNTSD9Aoag_mQJI7THyeClxhT4nVJpZs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,66 @@
+name: daypilot
+description: AI-Powered Daily Routine & Reminder App
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.5
+  # State Management
+  flutter_riverpod: ^2.3.6
+  # Local Storage
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  # Firebase
+  firebase_core: ^2.13.1
+  firebase_auth: ^4.6.2
+  cloud_firestore: ^4.8.0
+  firebase_messaging: ^14.6.2
+  # Notifications
+  flutter_local_notifications: ^17.0.0
+  # UI Components
+  google_fonts: ^4.0.4
+  flutter_svg: ^2.0.6
+  shimmer: ^3.0.0
+  lottie: ^2.4.0
+  confetti: ^0.7.0
+  # Calendar
+  table_calendar: ^3.0.9
+  # Charts
+  fl_chart: ^0.63.0
+  # Utils
+  intl: ^0.18.1
+  url_launcher: ^6.1.11
+  shared_preferences: ^2.1.1
+  # AI Integration
+  http: ^0.13.6
+  # Voice Commands
+  speech_to_text: ^7.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.1
+  hive_generator: ^2.0.0
+  build_runner: ^2.4.5
+  flutter_launcher_icons: ^0.14.4
+
+# App Icon Configuration
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#6366F1"
+  adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+  min_sdk_android: 21
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
