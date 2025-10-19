@@ -139,18 +139,12 @@ class _RemindersScreenState extends State<RemindersScreen> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          decoration: const InputDecoration(
-                            hintText: 'Reminder message',
-                            prefixIcon: Icon(Icons.edit_note),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                          ),
-                        ),
-                      ),
-                    ],
+                  TextField(
+                    decoration: const InputDecoration(
+                      hintText: 'Reminder message',
+                      prefixIcon: Icon(Icons.edit_note),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Row(

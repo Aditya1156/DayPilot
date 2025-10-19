@@ -7,6 +7,16 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+import java.util.Properties
+import java.io.FileInputStream
+
+// Load signing properties from android/key.properties if present
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+}
+
 android {
     namespace = "com.daypilot.app"
     compileSdk = flutter.compileSdkVersion
@@ -35,9 +45,19 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            // Use a signing config from key.properties when available.
+            // If key.properties / keystore is not present the build will fall back to debug signing.
+            if (keystorePropertiesFile.exists()) {
+                signingConfig = signingConfigs.create("release").apply {
+                    keyAlias = keystoreProperties.getProperty("keyAlias")
+                    keyPassword = keystoreProperties.getProperty("keyPassword")
+                    storeFile = file(keystoreProperties.getProperty("storeFile"))
+                    storePassword = keystoreProperties.getProperty("storePassword")
+                }
+            } else {
+                // Fallback to debug signing for local/debug runs
+                signingConfig = signingConfigs.getByName("debug")
+            }
         }
     }
 }

@@ -190,7 +190,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     const SizedBox(height: 16),
                     
                     // Task Cards Grid
-                    _buildTaskGrid(tasks, tasksNotifier),                    // AI Suggestions Section
+                    _buildTaskGrid(tasks, tasksNotifier),
+                    
+                    // AI Suggestions Section
                     const SizedBox(height: 24),
                     Text(
                       "AI Suggestions",

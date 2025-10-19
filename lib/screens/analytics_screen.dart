@@ -8,13 +8,13 @@ class AnalyticsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     // Enhanced placeholder metrics with trends
-    final double completionRate = 0.82;
-    final double avgFocusHours = 5.2;
-    final int streakDays = 12;
-    final double weeklyGrowth = 0.15; // 15% improvement
+    const double completionRate = 0.82;
+    const double avgFocusHours = 5.2;
+    const int streakDays = 12;
+    const double weeklyGrowth = 0.15; // 15% improvement
     
     // Weekly completion data for mini chart
-    final List<double> weeklyData = [0.65, 0.72, 0.78, 0.75, 0.82, 0.85, 0.82];
+    const List<double> weeklyData = [0.65, 0.72, 0.78, 0.75, 0.82, 0.85, 0.82];
 
     return Scaffold(
       appBar: AppBar(title: const Text('Analytics')),
@@ -59,7 +59,7 @@ class AnalyticsScreen extends StatelessWidget {
                           '${(completionRate * 100).round()}%',
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
+                            color: theme.colorScheme.primary,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -93,7 +93,7 @@ class AnalyticsScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('Focus Time', style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withAlpha(180))),
-                            Icon(Icons.access_time, size: 14, color: Theme.of(context).colorScheme.tertiary),
+                            Icon(Icons.access_time, size: 14, color: theme.colorScheme.tertiary),
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -101,7 +101,7 @@ class AnalyticsScreen extends StatelessWidget {
                           '${avgFocusHours.toStringAsFixed(1)}h',
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.tertiary,
+                            color: theme.colorScheme.tertiary,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -129,7 +129,7 @@ class AnalyticsScreen extends StatelessWidget {
                           '$streakDays',
                           style: theme.textTheme.headlineMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.secondary,
+                            color: theme.colorScheme.secondary,
                           ),
                         ),
                         const SizedBox(height: 4),

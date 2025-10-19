@@ -62,8 +62,7 @@ class TaskCard extends StatelessWidget {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Flexible(
-                              flex: 0,
+                            Expanded(
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
@@ -82,9 +81,8 @@ class TaskCard extends StatelessWidget {
                                       size: 14,
                                       color: task.categoryColor,
                                     ),
-                                    const SizedBox(width: 6),
-                                    ConstrainedBox(
-                                      constraints: const BoxConstraints(maxWidth: 120),
+                                    const SizedBox(width: 4),
+                                    Flexible(
                                       child: Text(
                                         task.category.name.toUpperCase(),
                                         maxLines: 1,
