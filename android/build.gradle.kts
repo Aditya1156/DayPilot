@@ -1,3 +1,15 @@
+plugins {
+    // Add the dependency for the Google services Gradle plugin; align with Flutter's bundled version
+    id("com.google.gms.google-services") version "4.3.15" apply false
+}
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
 allprojects {
     repositories {
         google()

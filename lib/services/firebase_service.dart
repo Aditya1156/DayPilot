@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:daypilot/models/user_profile.dart';
-import 'package:daypilot/models/task.dart';
+import '../models/user_profile.dart';
+import '../models/task.dart';
 
 /// Centralized Firebase service for all database operations
 class FirebaseService {
@@ -29,12 +29,30 @@ class FirebaseService {
 
   /// Create or update user profile
   Future<void> saveUserProfile(UserProfile profile) async {
-    if (!isAvailable()) return;
+    print('🔧 FirebaseService.saveUserProfile called');
+    print('🔧 Service available: ${isAvailable()}');
     
-    await _firestore
-        .collection('users')
-        .doc(profile.uid)
-        .set(profile.toFirestore(), SetOptions(merge: true));
+    if (!isAvailable()) {
+      print('❌ Firebase service not available, returning early');
+      return;
+    }
+    
+    try {
+      print('🔧 About to save to Firestore collection: users');
+      print('🔧 Document ID (UID): ${profile.uid}');
+      print('🔧 Profile data: ${profile.toFirestore()}');
+      
+      await _firestore
+          .collection('users')
+          .doc(profile.uid)
+          .set(profile.toFirestore(), SetOptions(merge: true));
+          
+      print('✅ Successfully saved to Firestore!');
+    } catch (e) {
+      print('❌ Error in saveUserProfile: $e');
+      print('❌ Error type: ${e.runtimeType}');
+      rethrow;
+    }
   }
 
   /// Get user profile

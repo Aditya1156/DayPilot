@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:daypilot/models/task.dart';
 import 'package:daypilot/providers/app_providers.dart';
-import 'package:daypilot/providers/user_provider_v2.dart';
+import 'package:daypilot/providers/user_profile_provider.dart';
 import 'package:daypilot/utils/theme.dart';
 import 'package:daypilot/widgets/circular_timeline.dart';
 import 'package:daypilot/widgets/task_card.dart';
@@ -10,7 +10,6 @@ import 'package:daypilot/widgets/ai_suggestion_card.dart';
 import 'package:daypilot/widgets/app_drawer.dart';
 import 'package:daypilot/widgets/user_profile_menu.dart';
 import 'package:daypilot/widgets/motivational_quote_card.dart';
-import 'package:daypilot/widgets/empty_state_widget.dart';
 import 'package:daypilot/widgets/task_search_delegate.dart';
 import 'package:daypilot/services/haptic_service.dart';
 import 'package:intl/intl.dart';
@@ -57,7 +56,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     final tasksNotifier = ref.read(tasksProvider.notifier);
     final today = DateFormat('EEEE, MMMM d').format(DateTime.now());
     final greeting = ref.watch(greetingProvider);
-    final username = ref.watch(userDisplayNameProvider);
+    final username = ref.watch(usernameProvider);
 
     // Calculate task progress
     final completedTasks = tasks.where((task) => task.status == TaskStatus.completed).length;
@@ -284,75 +283,117 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     _hapticService.lightImpact();
     showModalBottomSheet(
       context: context,
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.check),
-            title: const Text('Mark Complete'),
-            onTap: () async {
-              await _hapticService.success();
-              task.status = TaskStatus.completed;
-              notifier.updateTask(task);
-              _confettiController.play();
-              Navigator.pop(context);
-              
-              // Show undo snackbar
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Task completed! 🎉'),
-                    action: SnackBarAction(
-                      label: 'UNDO',
-                      onPressed: () {
-                        _hapticService.lightImpact();
-                        task.status = TaskStatus.pending;
-                        notifier.updateTask(task);
-                      },
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            ListTile(
+              leading: Icon(
+                task.status == TaskStatus.completed ? Icons.replay : Icons.check,
+                color: Colors.green,
+              ),
+              title: Text(
+                task.status == TaskStatus.completed ? 'Mark Incomplete' : 'Mark Complete',
+              ),
+              onTap: () async {
+                await _hapticService.success();
+                task.status = task.status == TaskStatus.completed 
+                    ? TaskStatus.pending 
+                    : TaskStatus.completed;
+                notifier.updateTask(task);
+                if (task.status == TaskStatus.completed) {
+                  _confettiController.play();
+                }
+                Navigator.pop(context);
+                
+                // Show snackbar
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        task.status == TaskStatus.completed 
+                            ? 'Task completed! 🎉' 
+                            : 'Task marked incomplete'
+                      ),
+                      duration: const Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
                     ),
-                    duration: const Duration(seconds: 3),
-                  ),
+                  );
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit, color: Colors.blue),
+              title: const Text('Edit Task'),
+              onTap: () async {
+                await _hapticService.lightImpact();
+                Navigator.pop(context);
+                _editTask(context, task, notifier);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.access_time, color: Colors.orange),
+              title: const Text('Change Time'),
+              onTap: () async {
+                await _hapticService.lightImpact();
+                Navigator.pop(context);
+                _changeTaskTime(context, task, notifier);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.copy, color: Colors.purple),
+              title: const Text('Duplicate Task'),
+              onTap: () async {
+                await _hapticService.lightImpact();
+                final duplicatedTask = Task(
+                  id: DateTime.now().millisecondsSinceEpoch.toString(),
+                  title: '${task.title} (Copy)',
+                  description: task.description,
+                  category: task.category,
+                  startTime: task.startTime.add(const Duration(hours: 1)),
+                  endTime: task.endTime.add(const Duration(hours: 1)),
+                  status: TaskStatus.pending,
                 );
-              }
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.edit),
-            title: const Text('Edit Task'),
-            onTap: () async {
-              await _hapticService.lightImpact();
-              // TODO: Implement edit task dialog
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.delete),
-            title: const Text('Delete Task'),
-            onTap: () async {
-              await _hapticService.warning();
-              final deletedTask = task;
-              notifier.deleteTask(task.id);
-              Navigator.pop(context);
-              
-              // Show undo snackbar
-              if (mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Task deleted'),
-                    action: SnackBarAction(
-                      label: 'UNDO',
-                      onPressed: () {
-                        _hapticService.lightImpact();
-                        notifier.addTask(deletedTask);
-                      },
+                notifier.addTask(duplicatedTask);
+                Navigator.pop(context);
+                
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Task duplicated'),
+                      duration: Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
                     ),
-                    duration: const Duration(seconds: 3),
-                  ),
-                );
-              }
-            },
-          ),
-        ],
+                  );
+                }
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text('Delete Task', style: TextStyle(color: Colors.red)),
+              onTap: () async {
+                await _hapticService.warning();
+                Navigator.pop(context);
+                _deleteTask(context, task, notifier);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -360,56 +401,482 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
   void _addNewTask(BuildContext context, TasksNotifier notifier) {
     _hapticService.lightImpact();
     final titleController = TextEditingController();
+    final descriptionController = TextEditingController();
     TaskCategory selectedCategory = TaskCategory.personal;
+    TimeOfDay selectedStartTime = TimeOfDay.now();
+    TimeOfDay selectedEndTime = TimeOfDay(hour: TimeOfDay.now().hour + 1, minute: TimeOfDay.now().minute);
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add New Task'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(labelText: 'Task Title'),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Add New Task'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Task Title *',
+                    border: OutlineInputBorder(),
+                  ),
+                  textCapitalization: TextCapitalization.sentences,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description (Optional)',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 2,
+                  textCapitalization: TextCapitalization.sentences,
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<TaskCategory>(
+                  value: selectedCategory,
+                  decoration: const InputDecoration(
+                    labelText: 'Category',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: TaskCategory.values.map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Row(
+                        children: [
+                          Icon(
+                            _getCategoryIcon(category),
+                            size: 20,
+                            color: _getCategoryColor(category),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(category.name.toUpperCase()),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) => setDialogState(() => selectedCategory = value!),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.access_time),
+                        label: Text(
+                          '${selectedStartTime.hour.toString().padLeft(2, '0')}:${selectedStartTime.minute.toString().padLeft(2, '0')}',
+                        ),
+                        onPressed: () async {
+                          final time = await showTimePicker(
+                            context: context,
+                            initialTime: selectedStartTime,
+                          );
+                          if (time != null) {
+                            setDialogState(() => selectedStartTime = time);
+                          }
+                        },
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      child: Text('to'),
+                    ),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.access_time),
+                        label: Text(
+                          '${selectedEndTime.hour.toString().padLeft(2, '0')}:${selectedEndTime.minute.toString().padLeft(2, '0')}',
+                        ),
+                        onPressed: () async {
+                          final time = await showTimePicker(
+                            context: context,
+                            initialTime: selectedEndTime,
+                          );
+                          if (time != null) {
+                            setDialogState(() => selectedEndTime = time);
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            DropdownButton<TaskCategory>(
-              value: selectedCategory,
-              items: TaskCategory.values.map((category) {
-                return DropdownMenuItem(
-                  value: category,
-                  child: Text(category.name.toUpperCase()),
-                );
-              }).toList(),
-              onChanged: (value) => setState(() => selectedCategory = value!),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                if (titleController.text.trim().isNotEmpty) {
+                  final now = DateTime.now();
+                  final newTask = Task(
+                    id: DateTime.now().millisecondsSinceEpoch.toString(),
+                    title: titleController.text.trim(),
+                    description: descriptionController.text.trim().isEmpty 
+                        ? null 
+                        : descriptionController.text.trim(),
+                    category: selectedCategory,
+                    startTime: DateTime(
+                      now.year,
+                      now.month,
+                      now.day,
+                      selectedStartTime.hour,
+                      selectedStartTime.minute,
+                    ),
+                    endTime: DateTime(
+                      now.year,
+                      now.month,
+                      now.day,
+                      selectedEndTime.hour,
+                      selectedEndTime.minute,
+                    ),
+                  );
+                  notifier.addTask(newTask);
+                  _hapticService.success();
+                  Navigator.pop(context);
+                  
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Task added successfully!'),
+                      duration: Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Add Task'),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _editTask(BuildContext context, Task task, TasksNotifier notifier) {
+    _hapticService.lightImpact();
+    final titleController = TextEditingController(text: task.title);
+    final descriptionController = TextEditingController(text: task.description ?? '');
+    TaskCategory selectedCategory = task.category;
+    TimeOfDay selectedStartTime = TimeOfDay.fromDateTime(task.startTime);
+    TimeOfDay selectedEndTime = TimeOfDay.fromDateTime(task.endTime);
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Edit Task'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Task Title *',
+                    border: OutlineInputBorder(),
+                  ),
+                  textCapitalization: TextCapitalization.sentences,
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: descriptionController,
+                  decoration: const InputDecoration(
+                    labelText: 'Description (Optional)',
+                    border: OutlineInputBorder(),
+                  ),
+                  maxLines: 2,
+                  textCapitalization: TextCapitalization.sentences,
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<TaskCategory>(
+                  value: selectedCategory,
+                  decoration: const InputDecoration(
+                    labelText: 'Category',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: TaskCategory.values.map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Row(
+                        children: [
+                          Icon(
+                            _getCategoryIcon(category),
+                            size: 20,
+                            color: _getCategoryColor(category),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(category.name.toUpperCase()),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (value) => setDialogState(() => selectedCategory = value!),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.access_time),
+                        label: Text(
+                          '${selectedStartTime.hour.toString().padLeft(2, '0')}:${selectedStartTime.minute.toString().padLeft(2, '0')}',
+                        ),
+                        onPressed: () async {
+                          final time = await showTimePicker(
+                            context: context,
+                            initialTime: selectedStartTime,
+                          );
+                          if (time != null) {
+                            setDialogState(() => selectedStartTime = time);
+                          }
+                        },
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8),
+                      child: Text('to'),
+                    ),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.access_time),
+                        label: Text(
+                          '${selectedEndTime.hour.toString().padLeft(2, '0')}:${selectedEndTime.minute.toString().padLeft(2, '0')}',
+                        ),
+                        onPressed: () async {
+                          final time = await showTimePicker(
+                            context: context,
+                            initialTime: selectedEndTime,
+                          );
+                          if (time != null) {
+                            setDialogState(() => selectedEndTime = time);
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                if (titleController.text.trim().isNotEmpty) {
+                  final updatedTask = Task(
+                    id: task.id,
+                    title: titleController.text.trim(),
+                    description: descriptionController.text.trim().isEmpty 
+                        ? null 
+                        : descriptionController.text.trim(),
+                    category: selectedCategory,
+                    startTime: DateTime(
+                      task.startTime.year,
+                      task.startTime.month,
+                      task.startTime.day,
+                      selectedStartTime.hour,
+                      selectedStartTime.minute,
+                    ),
+                    endTime: DateTime(
+                      task.endTime.year,
+                      task.endTime.month,
+                      task.endTime.day,
+                      selectedEndTime.hour,
+                      selectedEndTime.minute,
+                    ),
+                    status: task.status,
+                  );
+                  notifier.updateTask(updatedTask);
+                  _hapticService.success();
+                  Navigator.pop(context);
+                  
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Task updated successfully!'),
+                      duration: Duration(seconds: 2),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Save Changes'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _changeTaskTime(BuildContext context, Task task, TasksNotifier notifier) {
+    TimeOfDay selectedStartTime = TimeOfDay.fromDateTime(task.startTime);
+    TimeOfDay selectedEndTime = TimeOfDay.fromDateTime(task.endTime);
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Change Task Time'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.start),
+                title: const Text('Start Time'),
+                trailing: Text(
+                  '${selectedStartTime.hour.toString().padLeft(2, '0')}:${selectedStartTime.minute.toString().padLeft(2, '0')}',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                onTap: () async {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime: selectedStartTime,
+                  );
+                  if (time != null) {
+                    setDialogState(() => selectedStartTime = time);
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.stop),
+                title: const Text('End Time'),
+                trailing: Text(
+                  '${selectedEndTime.hour.toString().padLeft(2, '0')}:${selectedEndTime.minute.toString().padLeft(2, '0')}',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                onTap: () async {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime: selectedEndTime,
+                  );
+                  if (time != null) {
+                    setDialogState(() => selectedEndTime = time);
+                  }
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final updatedTask = Task(
+                  id: task.id,
+                  title: task.title,
+                  description: task.description,
+                  category: task.category,
+                  startTime: DateTime(
+                    task.startTime.year,
+                    task.startTime.month,
+                    task.startTime.day,
+                    selectedStartTime.hour,
+                    selectedStartTime.minute,
+                  ),
+                  endTime: DateTime(
+                    task.endTime.year,
+                    task.endTime.month,
+                    task.endTime.day,
+                    selectedEndTime.hour,
+                    selectedEndTime.minute,
+                  ),
+                  status: task.status,
+                );
+                notifier.updateTask(updatedTask);
+                _hapticService.success();
+                Navigator.pop(context);
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Task time updated!'),
+                    duration: Duration(seconds: 2),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+              child: const Text('Update'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _deleteTask(BuildContext context, Task task, TasksNotifier notifier) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Task'),
+        content: Text('Are you sure you want to delete "${task.title}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
-          TextButton(
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
             onPressed: () {
-              if (titleController.text.isNotEmpty) {
-                final newTask = Task(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
-                  title: titleController.text,
-                  category: selectedCategory,
-                  startTime: DateTime.now().add(const Duration(hours: 1)),
-                  endTime: DateTime.now().add(const Duration(hours: 2)),
-                );
-                notifier.addTask(newTask);
-                Navigator.pop(context);
-              }
+              final deletedTask = task;
+              notifier.deleteTask(task.id);
+              _hapticService.warning();
+              Navigator.pop(context);
+              
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Task deleted'),
+                  action: SnackBarAction(
+                    label: 'UNDO',
+                    onPressed: () {
+                      _hapticService.lightImpact();
+                      notifier.addTask(deletedTask);
+                    },
+                  ),
+                  duration: const Duration(seconds: 4),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
             },
-            child: const Text('Add'),
+            child: const Text('Delete'),
           ),
         ],
       ),
     );
+  }
+
+  IconData _getCategoryIcon(TaskCategory category) {
+    switch (category) {
+      case TaskCategory.work:
+        return Icons.work;
+      case TaskCategory.personal:
+        return Icons.person;
+      case TaskCategory.health:
+        return Icons.fitness_center;
+      case TaskCategory.study:
+        return Icons.school;
+    }
+  }
+
+  Color _getCategoryColor(TaskCategory category) {
+    switch (category) {
+      case TaskCategory.work:
+        return Colors.blue;
+      case TaskCategory.personal:
+        return Colors.amber;
+      case TaskCategory.health:
+        return Colors.green;
+      case TaskCategory.study:
+        return Colors.purple;
+    }
   }
 
   Widget _buildTimeSection({
@@ -591,6 +1058,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           confirmDismiss: (direction) async {
             if (direction == DismissDirection.endToStart) {
               // Swipe left to delete
+              _hapticService.warning();
               return await showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
@@ -601,7 +1069,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       onPressed: () => Navigator.pop(context, false),
                       child: const Text('Cancel'),
                     ),
-                    TextButton(
+                    FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
                       onPressed: () => Navigator.pop(context, true),
                       child: const Text('Delete'),
                     ),
@@ -609,37 +1080,109 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 ),
               );
             } else {
-              // Swipe right to complete
-              task.status = TaskStatus.completed;
+              // Swipe right to complete/uncomplete
+              _hapticService.success();
+              task.status = task.status == TaskStatus.completed 
+                  ? TaskStatus.pending 
+                  : TaskStatus.completed;
               tasksNotifier.updateTask(task);
-              _confettiController.play();
+              if (task.status == TaskStatus.completed) {
+                _confettiController.play();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Task completed! 🎉'),
+                    duration: Duration(seconds: 2),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
               return false; // Don't dismiss, just update
+            }
+          },
+          onDismissed: (direction) {
+            if (direction == DismissDirection.endToStart) {
+              // Task was deleted
+              final deletedTask = task;
+              tasksNotifier.deleteTask(task.id);
+              
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Task deleted'),
+                  action: SnackBarAction(
+                    label: 'UNDO',
+                    onPressed: () {
+                      _hapticService.lightImpact();
+                      tasksNotifier.addTask(deletedTask);
+                    },
+                  ),
+                  duration: const Duration(seconds: 4),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
             }
           },
           background: Container(
             decoration: BoxDecoration(
-              color: Colors.green,
+              gradient: LinearGradient(
+                colors: [
+                  Colors.green.shade400,
+                  Colors.green.shade600,
+                ],
+              ),
               borderRadius: BorderRadius.circular(20),
             ),
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.only(left: 20),
-            child: const Icon(
-              Icons.check,
-              color: Colors.white,
-              size: 30,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  task.status == TaskStatus.completed ? Icons.replay : Icons.check_circle,
+                  color: Colors.white,
+                  size: 32,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  task.status == TaskStatus.completed ? 'Undo' : 'Complete',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
           ),
           secondaryBackground: Container(
             decoration: BoxDecoration(
-              color: Colors.red,
+              gradient: LinearGradient(
+                colors: [
+                  Colors.red.shade600,
+                  Colors.red.shade400,
+                ],
+              ),
               borderRadius: BorderRadius.circular(20),
             ),
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 20),
-            child: const Icon(
-              Icons.delete,
-              color: Colors.white,
-              size: 30,
+            child: const Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.delete_forever,
+                  color: Colors.white,
+                  size: 32,
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Delete',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
           ),
           child: TaskCard(

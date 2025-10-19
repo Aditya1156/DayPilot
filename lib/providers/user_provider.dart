@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Check if Firebase is initialized
 bool _isFirebaseInitialized() {
@@ -29,13 +30,28 @@ final currentUserProvider = Provider<User?>((ref) {
   return authState.value;
 });
 
-// User display name provider
-final userDisplayNameProvider = Provider<String>((ref) {
+// User display name provider with SharedPreferences fallback
+final userDisplayNameProvider = FutureProvider<String>((ref) async {
   if (!_isFirebaseInitialized()) {
-    return 'Guest User';
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('username') ?? 'Guest User';
   }
   final user = ref.watch(currentUserProvider);
-  return user?.displayName ?? user?.email?.split('@').first ?? 'User';
+  
+  // Try Firebase user's display name first
+  if (user?.displayName != null && user!.displayName!.isNotEmpty) {
+    return user.displayName!;
+  }
+  
+  // Try SharedPreferences as fallback
+  final prefs = await SharedPreferences.getInstance();
+  final savedUsername = prefs.getString('username');
+  if (savedUsername != null && savedUsername.isNotEmpty) {
+    return savedUsername;
+  }
+  
+  // Last resort: use email or 'User'
+  return user?.email?.split('@').first ?? 'User';
 });
 
 // User email provider

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "709481313590",
-    "project_id": "pesitm-connect",
-    "storage_bucket": "pesitm-connect.firebasestorage.app"
+    "project_number": "106663376783",
+    "project_id": "kinetic-folio-2p425",
+    "storage_bucket": "kinetic-folio-2p425.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:709481313590:android:39724d1221b7cc9a8faf97",
+        "mobilesdk_app_id": "1:106663376783:android:7716d2c6f34772881abdfa",
         "android_client_info": {
           "package_name": "com.daypilot.app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDaNTSD9Aoag_mQJI7THyeClxhT4nVJpZs"
+          "current_key": "AIzaSyC7RSu3LrCeDJgvsXbfOY3io3bYLud5WOY"
         }
       ],
       "services": {

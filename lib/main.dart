@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'firebase_options.dart';
 import 'package:daypilot/models/task.dart';
 import 'package:daypilot/services/notification_service.dart';
 import 'package:daypilot/screens/login_screen.dart';
@@ -35,16 +36,20 @@ Future<void> main() async {
   // Initialize notifications
   await NotificationService.initialize();
 
-  // Attempt Firebase init. If Firebase options are not configured for the
-  // current platform this will print a message and continue — prevents crash
-  // during early development when Firebase isn't set up yet.
+  // Initialize Firebase with proper options
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print('✅ Firebase initialized successfully');
+    print('🔧 Firebase app: ${Firebase.app().name}');
+    print('🔧 Firebase project: ${Firebase.app().options.projectId}');
+    // Note: setPersistence is web-only. Mobile platforms have persistence enabled by default.
   } catch (e) {
     // Safe to continue; backend integration can be added later.
     // Print to help developer notice missing Firebase setup during development.
     // ignore: avoid_print
-    print('Firebase initialization skipped or failed: $e');
+    print('❌ Firebase initialization failed: $e');
   }
 
   runApp(
@@ -94,11 +99,34 @@ class AuthWrapper extends StatefulWidget {
 
 class _AuthWrapperState extends State<AuthWrapper> {
   bool? _onboardingComplete;
+  User? _currentUser;
+  bool? _usernameSetupComplete;
 
   @override
   void initState() {
     super.initState();
     _checkOnboarding();
+    // Listen to auth state changes
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      print('🔄 Auth state changed: ${user?.uid ?? 'null'}');
+      if (user != null) {
+        // User logged in - add small delay to ensure SharedPreferences is saved
+        await Future.delayed(const Duration(milliseconds: 100));
+        // Check username setup
+        await _checkUsernameSetup();
+        print('👤 Username setup check complete: $_usernameSetupComplete');
+      } else {
+        // User logged out - reset username state
+        setState(() {
+          _usernameSetupComplete = null;
+        });
+      }
+      // Update user state AFTER checking username setup
+      setState(() {
+        _currentUser = user;
+      });
+      print('✅ Auth state update complete - User: ${user?.uid ?? 'null'}, Setup: $_usernameSetupComplete');
+    });
   }
 
   Future<void> _checkOnboarding() async {
@@ -108,9 +136,11 @@ class _AuthWrapperState extends State<AuthWrapper> {
     });
   }
 
-  Future<bool> _checkUsernameSetup() async {
+  Future<void> _checkUsernameSetup() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('username_setup_complete') ?? false;
+    setState(() {
+      _usernameSetupComplete = prefs.getBool('username_setup_complete') ?? false;
+    });
   }
 
   bool _isFirebaseAvailable() {
@@ -138,54 +168,39 @@ class _AuthWrapperState extends State<AuthWrapper> {
       return const OnboardingScreen();
     }
 
-    // Check username setup after onboarding
-    return FutureBuilder<bool>(
-      future: _checkUsernameSetup(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        
-        // Show username setup if not complete
-        if (snapshot.data == false) {
-          return const UsernameSetupScreen();
-        }
+    // Check if Firebase is initialized
+    if (!_isFirebaseAvailable()) {
+      // Firebase not initialized, go directly to dashboard
+      return const DashboardScreen();
+    }
 
-        // Check if Firebase is initialized
-        if (!_isFirebaseAvailable()) {
-          // Firebase not initialized, go directly to dashboard
-          return const DashboardScreen();
-        }
+    final user = _currentUser;
+    final usernameSetupComplete = _usernameSetupComplete ?? false;
 
-        return StreamBuilder<User?>(
-          stream: FirebaseAuth.instance.authStateChanges(),
-          builder: (context, snapshot) {
-            // Handle errors
-            if (snapshot.hasError) {
-              return const DashboardScreen();
-            }
-            
-            // Show loading while checking auth state
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-            
-            // Show login if not authenticated
-            if (!snapshot.hasData || snapshot.data == null) {
-              return const LoginScreen();
-            }
-            
-            // Show dashboard if authenticated
-            return const DashboardScreen();
-          },
-        );
-      },
-    );
+    print('🔐 Auth state: ${user != null ? 'Authenticated (${user.uid})' : 'Not authenticated'}');
+    print('👤 Username setup: ${usernameSetupComplete ? 'Complete' : 'Incomplete'}');
+
+    // Show loading while checking username setup for authenticated user
+    if (user != null && _usernameSetupComplete == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // Show username setup if not complete and user is authenticated
+    if (!usernameSetupComplete && user != null) {
+      print('👤 Showing username setup screen');
+      return const UsernameSetupScreen();
+    }
+
+    // Show login if not authenticated
+    if (user == null) {
+      print('👤 Showing login screen');
+      return const LoginScreen();
+    }
+
+    // Show dashboard if authenticated and username setup is complete
+    print('🏠 Showing dashboard for user: ${user.uid}');
+    return const DashboardScreen();
   }
 }

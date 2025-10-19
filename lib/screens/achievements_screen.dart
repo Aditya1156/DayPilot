@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:daypilot/utils/theme.dart';
 import 'package:daypilot/widgets/app_drawer.dart';
 
 class AchievementsScreen extends StatelessWidget {
@@ -7,8 +6,6 @@ class AchievementsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Achievements'),

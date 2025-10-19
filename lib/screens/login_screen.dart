@@ -13,16 +13,17 @@ class LoginScreen extends ConsumerStatefulWidget {
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProviderStateMixin {
+class _LoginScreenState extends ConsumerState<LoginScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _nameController = TextEditingController();
-  
+
   bool _isLogin = true;
   bool _isLoading = false;
   bool _obscurePassword = true;
-  
+
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
@@ -34,16 +35,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     );
-    
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
-    
+
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic));
-    
+    ).animate(CurvedAnimation(
+        parent: _animationController, curve: Curves.easeOutCubic));
+
     _animationController.forward();
   }
 
@@ -63,93 +65,305 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
 
     try {
       final auth = FirebaseAuth.instance;
-      
+
+      // Debug logging
+      print('🔐 Auth attempt: ${_isLogin ? "LOGIN" : "SIGNUP"}');
+      print('📧 Email: ${_emailController.text.trim()}');
+
       if (_isLogin) {
         // Login
-        await auth.signInWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
-      } else {
-        // Sign up
-        final credential = await auth.createUserWithEmailAndPassword(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
-        
-        // Update display name
-        if (credential.user != null) {
-          await credential.user!.updateDisplayName(_nameController.text.trim());
-          await credential.user!.reload();
-          
-          // Save user profile to Firestore
-          final firebaseService = FirebaseService();
-          if (firebaseService.isAvailable()) {
-            final userProfile = UserProfile(
-              uid: credential.user!.uid,
-              email: _emailController.text.trim(),
-              username: _nameController.text.trim(),
-              createdAt: DateTime.now(),
-              lastActive: DateTime.now(),
-            );
-            await firebaseService.saveUserProfile(userProfile);
-            
-            // Save username to local storage as well
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.setString('username', _nameController.text.trim());
+        print('🔑 Attempting login...');
+        User? user;
+        try {
+          final credential = await auth.signInWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
+          user = credential.user;
+          print('✅ Login successful! UID: ${user?.uid}');
+        } on FirebaseAuthException {
+          rethrow;
+        } catch (e) {
+          if (_isKnownFirebaseAuthPluginBug(e)) {
+            print('! Known firebase_auth plugin bug (non-critical): $e');
+            print('   Continuing with current user session.');
+            user = auth.currentUser;
+          } else {
+            rethrow;
           }
         }
+
+        // Sync user profile to Firestore (create if missing)
+        if (user != null) {
+          try {
+            final firebaseService = FirebaseService();
+            if (firebaseService.isAvailable()) {
+              // Check if user profile exists in Firestore
+              print('🔍 Checking if Firestore profile exists...');
+              final existingProfile =
+                  await firebaseService.getUserProfile(user.uid);
+
+              if (existingProfile == null) {
+                // Profile missing! Create it now (fixes Auth-only accounts)
+                print('⚠️ Firestore profile missing! Creating now...');
+                final newProfile = UserProfile(
+                  uid: user.uid,
+                  email: user.email ?? _emailController.text.trim(),
+                  username:
+                      user.displayName ?? user.email?.split('@')[0] ?? 'User',
+                  createdAt: DateTime.now(),
+                  lastActive: DateTime.now(),
+                );
+                await firebaseService.saveUserProfile(newProfile);
+                print('✅ Firestore profile created successfully!');
+
+                // Save to local storage too
+                try {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setString('username', newProfile.username);
+                  await prefs.setString('email', newProfile.email);
+                  await prefs.setBool('username_setup_complete', true); // Mark setup as complete
+                  print('✅ Profile saved to local storage');
+                } catch (e) {
+                  print('⚠️ Local storage save failed: $e');
+                }
+              } else {
+                // Profile exists, just update last active
+                print('✅ Firestore profile exists');
+                await firebaseService.updateLastActive(user.uid);
+                print('✅ Last active timestamp updated');
+                
+                // Ensure username setup is marked as complete
+                try {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setBool('username_setup_complete', true);
+                  print('✅ Username setup marked as complete');
+                } catch (e) {
+                  print('⚠️ Failed to mark username setup complete: $e');
+                }
+              }
+            }
+          } catch (e) {
+            print('⚠️ Firestore sync failed (non-critical): $e');
+            // Non-critical, continue with login
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                      'Profile sync incomplete. Please check your connection.'),
+                  backgroundColor: Colors.orange,
+                  duration: Duration(seconds: 3),
+                ),
+              );
+            }
+          }
+        } else {
+          print('⚠️ Login succeeded but no active user session detected.');
+        }
+      } else {
+        // Sign up
+        print('📝 Attempting signup...');
+
+        // Step 1: Create Firebase Auth user
+        User? user;
+        try {
+          final credential = await auth.createUserWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
+          user = credential.user;
+          print('✅ Signup successful! UID: ${user?.uid}');
+        } on FirebaseAuthException {
+          rethrow;
+        } catch (e) {
+          if (_isKnownFirebaseAuthPluginBug(e)) {
+            print('! Known firebase_auth plugin bug (non-critical): $e');
+            print('   Continuing with current user session.');
+            user = auth.currentUser;
+          } else {
+            rethrow;
+          }
+        }
+
+        if (user != null) {
+          final username = _nameController.text.trim();
+          final email = _emailController.text.trim();
+          final uid = user.uid;
+
+          print('🔧 Starting post-signup data save process...');
+
+          // Step 2: Save to Firestore IMMEDIATELY (before any other Firebase operations)
+          bool firestoreSaved = false;
+          try {
+            final firebaseService = FirebaseService();
+            print(
+                '🔧 Firebase service available: ${firebaseService.isAvailable()}');
+
+            if (firebaseService.isAvailable()) {
+              print('💾 Saving user profile to Firestore...');
+              print('🆔 User UID: $uid');
+              print('📧 Email: $email');
+              print('👤 Username: $username');
+
+              final userProfile = UserProfile(
+                uid: uid,
+                email: email,
+                username: username,
+                createdAt: DateTime.now(),
+                lastActive: DateTime.now(),
+              );
+
+              print('📄 Profile data: ${userProfile.toFirestore()}');
+
+              await firebaseService.saveUserProfile(userProfile);
+              print('✅ User profile saved to Firestore successfully!');
+              firestoreSaved = true;
+            } else {
+              print('❌ Firebase service not available!');
+            }
+          } catch (firestoreError) {
+            print('❌ Firestore save failed: $firestoreError');
+            print('📊 Error details: ${firestoreError.runtimeType}');
+            if (firestoreError is FirebaseException) {
+              print('🔍 Firebase error code: ${firestoreError.code}');
+              print('🔍 Firebase error message: ${firestoreError.message}');
+            } else {
+              print('🔍 Full error: $firestoreError');
+            }
+          }
+
+          // Step 3: Save to SharedPreferences (local backup)
+          try {
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setString('username', username);
+            await prefs.setString('email', email);
+            await prefs.setBool('username_setup_complete', true); // Mark setup as complete
+            print('✅ User data saved to local storage');
+          } catch (e) {
+            print('⚠️ Failed to save to local storage: $e');
+          }
+
+          // Step 4: Try Firebase Auth operations (these may fail due to plugin bug, but data is already saved)
+          try {
+            print('👤 Attempting Firebase Auth display name update...');
+            await user.updateDisplayName(username);
+            print('✅ Firebase Auth display name updated');
+          } catch (displayNameError) {
+            print(
+                '⚠️ Firebase Auth display name update failed (non-critical, known bug in firebase_auth 4.16.0)');
+            print('   Error: $displayNameError');
+            // This is expected with firebase_auth 4.16.0 - profile data is already saved elsewhere
+          }
+
+          try {
+            await user.reload();
+            print('✅ User reloaded successfully');
+          } catch (reloadError) {
+            print('⚠️ User reload failed (non-critical): $reloadError');
+          }
+
+          // Step 5: Show result message
+          if (firestoreSaved) {
+            print('🎉 Signup completed successfully with full profile sync!');
+          } else {
+            print('⚠️ Signup completed, but profile sync incomplete');
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                      'Account created! Profile data will sync when connection is restored.'),
+                  backgroundColor: Colors.orange,
+                  duration: Duration(seconds: 4),
+                ),
+              );
+            }
+          }
+        } else {
+          print('❌ Signup reported success but no active user session found.');
+        }
       }
+
+      print('🎉 Authentication completed successfully!');
+      
+      // Force a small delay to ensure auth state propagates
+      await Future.delayed(const Duration(milliseconds: 200));
+      
+      // Verify current user state
+      final currentUser = FirebaseAuth.instance.currentUser;
+      print('🔍 Current user after auth: ${currentUser?.uid ?? 'null'}');
       
       // Don't navigate manually - let StreamBuilder handle it
       // The auth state change will trigger navigation automatically
     } on FirebaseAuthException catch (e) {
+      print('❌ FirebaseAuthException: ${e.code} - ${e.message}');
       String message = 'Authentication failed';
-      
+
       switch (e.code) {
         case 'user-not-found':
-          message = 'No user found with this email';
+          message =
+              'No account found with this email.\nPlease sign up first or check your email address.';
           break;
         case 'wrong-password':
-          message = 'Incorrect password';
+          message =
+              'Incorrect password.\nPlease try again or reset your password.';
+          break;
+        case 'invalid-credential':
+          message =
+              'Invalid email or password.\nPlease check your credentials and try again.';
           break;
         case 'email-already-in-use':
-          message = 'Email already registered';
+          message = 'Email already registered.\nPlease log in instead.';
           break;
         case 'weak-password':
-          message = 'Password is too weak';
+          message = 'Password is too weak.\nUse at least 6 characters.';
           break;
         case 'invalid-email':
-          message = 'Invalid email address';
+          message =
+              'Invalid email address format.\nPlease check and try again.';
           break;
         case 'network-request-failed':
-          message = 'Network error. Please check your connection';
+          message = 'Network error.\nPlease check your internet connection.';
           break;
         case 'too-many-requests':
-          message = 'Too many attempts. Please try again later';
+          message =
+              'Too many failed attempts.\nPlease wait a moment and try again.';
           break;
+        default:
+          message = 'Authentication error: ${e.code}\n${e.message}';
       }
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(message),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 5),
           ),
         );
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('An error occurred: ${e.toString()}'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+      // Filter out known non-critical firebase_auth plugin bug
+      if (_isKnownFirebaseAuthPluginBug(e)) {
+        print('⚠️ Known firebase_auth plugin bug (non-critical): $e');
+        print(
+            '   This error can be safely ignored - authentication succeeded.');
+        // Don't show error to user, account was created successfully
+      } else {
+        // Real error, show to user
+        print('❌ General exception during auth: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('An error occurred: ${e.toString()}'),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
     } finally {
+      print('🔄 Resetting loading state');
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -158,10 +372,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
 
   Future<void> _handleGoogleSignIn() async {
     setState(() => _isLoading = true);
-    
+
     // TODO: Implement Google Sign-In
     await Future.delayed(const Duration(seconds: 1));
-    
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -173,12 +387,110 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
     }
   }
 
+  Future<void> _handleForgotPassword() async {
+    // Show dialog to enter email
+    final emailController = TextEditingController(text: _emailController.text);
+
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset Password'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Enter your email address and we\'ll send you a password reset link.',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: emailController,
+              decoration: InputDecoration(
+                labelText: 'Email',
+                prefixIcon:
+                    Icon(Icons.email_outlined, color: AppColors.primaryColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              keyboardType: TextInputType.emailAddress,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryColor,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Send Reset Link'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true && emailController.text.isNotEmpty) {
+      try {
+        await FirebaseAuth.instance.sendPasswordResetEmail(
+          email: emailController.text.trim(),
+        );
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Password reset email sent! Check your inbox.'),
+              backgroundColor: Colors.green,
+              behavior: SnackBarBehavior.floating,
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
+      } on FirebaseAuthException catch (e) {
+        String message = 'Failed to send reset email';
+
+        switch (e.code) {
+          case 'user-not-found':
+            message = 'No account found with this email address.';
+            break;
+          case 'invalid-email':
+            message = 'Invalid email address format.';
+            break;
+          case 'too-many-requests':
+            message = 'Too many requests. Please wait a moment and try again.';
+            break;
+        }
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    }
+  }
+
   void _toggleAuthMode() {
     setState(() {
       _isLogin = !_isLogin;
       _animationController.reset();
       _animationController.forward();
     });
+  }
+
+  bool _isKnownFirebaseAuthPluginBug(Object error) {
+    final message = error.toString();
+    return message.contains('PigeonUserDetails') &&
+        message.contains('List<Object?>');
   }
 
   @override
@@ -209,14 +521,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                     children: [
                       // Logo
                       _buildLogo(),
-                      
+
                       const SizedBox(height: 48),
-                      
+
                       // Auth Form Card
                       _buildAuthCard(),
-                      
+
                       const SizedBox(height: 24),
-                      
+
                       // Social Login
                       _buildSocialLogin(),
                     ],
@@ -300,12 +612,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               Text(
-                _isLogin 
-                    ? 'Sign in to continue your journey' 
+                _isLogin
+                    ? 'Sign in to continue your journey'
                     : 'Join us to boost your productivity',
                 style: TextStyle(
                   fontSize: 14,
@@ -313,9 +625,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                 ),
                 textAlign: TextAlign.center,
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Name field (only for signup)
               if (!_isLogin) ...[
                 _buildTextField(
@@ -331,7 +643,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                 ),
                 const SizedBox(height: 16),
               ],
-              
+
               // Email field
               _buildTextField(
                 controller: _emailController,
@@ -348,9 +660,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                   return null;
                 },
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Password field
               _buildTextField(
                 controller: _passwordController,
@@ -359,9 +671,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                 obscureText: _obscurePassword,
                 suffixIcon: IconButton(
                   icon: Icon(
-                    _obscurePassword ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                    _obscurePassword
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
                   ),
-                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -373,22 +688,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                   return null;
                 },
               ),
-              
+
               // Forgot password (only for login)
               if (_isLogin) ...[
                 const SizedBox(height: 8),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {
-                      // TODO: Implement forgot password
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Password reset coming soon!'),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
-                    },
+                    onPressed: _handleForgotPassword,
                     child: Text(
                       'Forgot Password?',
                       style: TextStyle(color: AppColors.primaryColor),
@@ -396,9 +703,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                   ),
                 ),
               ],
-              
+
               const SizedBox(height: 24),
-              
+
               // Submit button
               ElevatedButton(
                 onPressed: _isLoading ? null : _handleAuth,
@@ -410,7 +717,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                     borderRadius: BorderRadius.circular(12),
                   ),
                   elevation: 0,
-                  disabledBackgroundColor: AppColors.primaryColor.withOpacity(0.6),
+                  disabledBackgroundColor:
+                      AppColors.primaryColor.withOpacity(0.6),
                 ),
                 child: _isLoading
                     ? Row(
@@ -421,7 +729,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -442,15 +751,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
                         ),
                       ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Toggle auth mode
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    _isLogin ? "Don't have an account? " : 'Already have an account? ',
+                    _isLogin
+                        ? "Don't have an account? "
+                        : 'Already have an account? ',
                     style: TextStyle(color: Colors.grey[600]),
                   ),
                   TextButton(
@@ -533,15 +844,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> with SingleTickerProv
               Expanded(child: Divider(color: Colors.white.withOpacity(0.5))),
             ],
           ),
-          
           const SizedBox(height: 24),
-          
           OutlinedButton.icon(
             onPressed: _isLoading ? null : _handleGoogleSignIn,
             icon: Image.asset(
               'assets/icons/google.png',
               height: 24,
-              errorBuilder: (context, error, stackTrace) => 
+              errorBuilder: (context, error, stackTrace) =>
                   const Icon(Icons.g_mobiledata, size: 24),
             ),
             label: const Text('Continue with Google'),

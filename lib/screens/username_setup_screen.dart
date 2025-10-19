@@ -76,7 +76,8 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
       }
 
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        // Instead of navigating, just pop back to let AuthWrapper handle the state
+        Navigator.of(context).pop();
       }
     } catch (e) {
       if (mounted) {

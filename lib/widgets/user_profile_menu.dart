@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import '../providers/user_provider.dart';
+import '../providers/user_profile_provider.dart';
+import '../models/user_profile.dart';
 import '../utils/theme.dart';
 
 // Check if Firebase is initialized
@@ -20,264 +22,537 @@ class UserProfileMenu extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(currentUserProvider);
-    final displayName = ref.watch(userDisplayNameProvider);
-    final email = ref.watch(userEmailProvider);
-    final photoUrl = ref.watch(userPhotoUrlProvider);
+    final profileAsync = ref.watch(userProfileProvider);
     final isDarkMode = ref.watch(themeModeProvider);
+    
+    // Handle loading and error states
+    return profileAsync.when(
+      data: (profile) {
+        final displayName = profile?.username ?? 'User';
+        final email = profile?.email ?? '';
+        final photoUrl = profile?.photoUrl;
 
-    return PopupMenuButton<String>(
-      offset: const Offset(0, 50),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Container(
-        margin: const EdgeInsets.only(right: 8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 18,
+        return PopupMenuButton<String>(
+          offset: const Offset(-10, 56),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          elevation: 8,
+          shadowColor: Colors.black26,
+          onSelected: (value) async {
+            switch (value) {
+              case 'profile':
+                _showEditProfileDialog(context, ref, profile);
+                break;
+              case 'settings':
+                Navigator.pushNamed(context, '/settings');
+                break;
+              case 'theme':
+                ref.read(themeModeProvider.notifier).state = !isDarkMode;
+                break;
+              case 'notifications':
+                final notifEnabled = ref.read(notificationsEnabledProvider);
+                ref.read(notificationsEnabledProvider.notifier).state = !notifEnabled;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      !notifEnabled ? 'Notifications enabled' : 'Notifications disabled',
+                    ),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                );
+                break;
+              case 'help':
+                _showHelpDialog(context);
+                break;
+              case 'logout':
+                _showLogoutDialog(context, ref);
+                break;
+            }
+          },
+          // Clean avatar-only button
+          child: Container(
+            margin: const EdgeInsets.only(right: 12),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primaryColor.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: CircleAvatar(
+              radius: 20,
               backgroundColor: AppColors.primaryColor,
               backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
               child: photoUrl == null
                   ? Text(
-                      displayName[0].toUpperCase(),
+                      displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
+                        fontSize: 18,
                       ),
                     )
                   : null,
             ),
-            const SizedBox(width: 8),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  displayName,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
+          ),
+          itemBuilder: (context) => [
+            // Enhanced Profile Header with gradient
+            PopupMenuItem<String>(
+              enabled: false,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Column(
+                  children: [
+                    // Avatar with gradient border
+                    Container(
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            AppColors.primaryColor,
+                            AppColors.accentColor,
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        radius: 36,
+                        backgroundColor: Colors.white,
+                        child: CircleAvatar(
+                          radius: 34,
+                          backgroundColor: AppColors.primaryColor,
+                          backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
+                          child: photoUrl == null
+                              ? Text(
+                                  displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 28,
+                                  ),
+                                )
+                              : null,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    // Name with better styling
+                    Text(
+                      displayName,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    // Email with icon
+                    if (email.isNotEmpty)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.email_outlined,
+                            size: 14,
+                            color: Colors.grey[600],
+                          ),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              email,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey[600],
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 12),
+                    Divider(height: 1, thickness: 1, color: Colors.grey[200]),
+                  ],
                 ),
-                if (email.isNotEmpty)
-                  Text(
-                    email,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey[600],
+              ),
+            ),
+            
+            // Edit Profile with enhanced styling
+            PopupMenuItem<String>(
+              value: 'profile',
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.person_outline,
+                      size: 20,
+                      color: AppColors.primaryColor,
                     ),
                   ),
-              ],
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Edit Profile',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(width: 4),
-            const Icon(Icons.arrow_drop_down, size: 20),
+            
+            // Settings
+            PopupMenuItem<String>(
+              value: 'settings',
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.settings_outlined,
+                      size: 20,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Settings',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Dark Mode Toggle
+            PopupMenuItem<String>(
+              value: 'theme',
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+                      size: 20,
+                      color: Colors.orange,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    isDarkMode ? 'Light Mode' : 'Dark Mode',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Notifications
+            PopupMenuItem<String>(
+              value: 'notifications',
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.purple.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.notifications_outlined,
+                      size: 20,
+                      color: Colors.purple,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Notifications',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            PopupMenuDivider(height: 1),
+            
+            // Help & Support
+            PopupMenuItem<String>(
+              value: 'help',
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.teal.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.help_outline,
+                      size: 20,
+                      color: Colors.teal,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Help & Support',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Logout with danger styling
+            PopupMenuItem<String>(
+              value: 'logout',
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(
+                      Icons.logout_rounded,
+                      size: 20,
+                      color: Colors.red[700],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Logout',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.red[700],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+      loading: () => Container(
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
           ],
         ),
+        child: CircleAvatar(
+          radius: 20,
+          backgroundColor: Colors.grey[300],
+          child: const SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          ),
+        ),
       ),
-      itemBuilder: (context) => [
-        // Profile Header
-        PopupMenuItem<String>(
-          enabled: false,
-          child: Column(
-            children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: AppColors.primaryColor,
-                backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
-                child: photoUrl == null
-                    ? Text(
-                        displayName[0].toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                        ),
-                      )
-                    : null,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                displayName,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              if (email.isNotEmpty)
-                Text(
-                  email,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
-                ),
-              const Divider(),
-            ],
+      error: (error, stack) => Container(
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.red.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: CircleAvatar(
+          radius: 20,
+          backgroundColor: Colors.red[100],
+          child: Icon(
+            Icons.error_outline,
+            color: Colors.red[700],
+            size: 22,
           ),
         ),
-        
-        // Edit Profile
-        PopupMenuItem<String>(
-          value: 'profile',
-          child: const Row(
-            children: [
-              Icon(Icons.person_outline, size: 20),
-              SizedBox(width: 12),
-              Text('Edit Profile'),
-            ],
-          ),
-        ),
-        
-        // Settings
-        PopupMenuItem<String>(
-          value: 'settings',
-          child: const Row(
-            children: [
-              Icon(Icons.settings_outlined, size: 20),
-              SizedBox(width: 12),
-              Text('Settings'),
-            ],
-          ),
-        ),
-        
-        // Dark Mode Toggle
-        PopupMenuItem<String>(
-          value: 'theme',
-          child: Row(
-            children: [
-              Icon(
-                isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Text(isDarkMode ? 'Light Mode' : 'Dark Mode'),
-            ],
-          ),
-        ),
-        
-        // Notifications
-        PopupMenuItem<String>(
-          value: 'notifications',
-          child: const Row(
-            children: [
-              Icon(Icons.notifications_outlined, size: 20),
-              SizedBox(width: 12),
-              Text('Notifications'),
-            ],
-          ),
-        ),
-        
-        const PopupMenuDivider(),
-        
-        // Help & Support
-        PopupMenuItem<String>(
-          value: 'help',
-          child: const Row(
-            children: [
-              Icon(Icons.help_outline, size: 20),
-              SizedBox(width: 12),
-              Text('Help & Support'),
-            ],
-          ),
-        ),
-        
-        // Logout
-        PopupMenuItem<String>(
-          value: 'logout',
-          child: Row(
-            children: [
-              Icon(Icons.logout, size: 20, color: Colors.red[700]),
-              const SizedBox(width: 12),
-              Text(
-                'Logout',
-                style: TextStyle(color: Colors.red[700]),
-              ),
-            ],
-          ),
-        ),
-      ],
-      onSelected: (value) async {
-        switch (value) {
-          case 'profile':
-            _showEditProfileDialog(context, ref, user);
-            break;
-          case 'settings':
-            Navigator.pushNamed(context, '/settings');
-            break;
-          case 'theme':
-            ref.read(themeModeProvider.notifier).state = !isDarkMode;
-            break;
-          case 'notifications':
-            final notifEnabled = ref.read(notificationsEnabledProvider);
-            ref.read(notificationsEnabledProvider.notifier).state = !notifEnabled;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  !notifEnabled ? 'Notifications enabled' : 'Notifications disabled',
-                ),
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-            break;
-          case 'help':
-            _showHelpDialog(context);
-            break;
-          case 'logout':
-            _showLogoutDialog(context);
-            break;
-        }
-      },
+      ),
     );
   }
 
-  void _showEditProfileDialog(BuildContext context, WidgetRef ref, User? user) {
-    final nameController = TextEditingController(text: user?.displayName ?? '');
+  void _showEditProfileDialog(BuildContext context, WidgetRef ref, UserProfile? profile) {
+    if (profile == null) return;
+    
+    final nameController = TextEditingController(text: profile.username);
     
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Edit Profile'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Icons.person_outline,
+                color: AppColors.primaryColor,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text('Edit Profile'),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nameController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Display Name',
-                border: OutlineInputBorder(),
+                hintText: 'Enter your name',
+                prefixIcon: Icon(Icons.badge_outlined, color: AppColors.primaryColor),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                ),
+                filled: true,
+                fillColor: Colors.grey[50],
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              'Email: ${user?.email ?? ''}',
-              style: TextStyle(color: Colors.grey[600]),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue[50],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.blue[100]!),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.email_outlined, color: Colors.blue[700], size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      profile.email,
+                      style: TextStyle(
+                        color: Colors.blue[700],
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
           ),
           ElevatedButton(
             onPressed: () async {
-              if (nameController.text.isNotEmpty) {
-                await user?.updateDisplayName(nameController.text);
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Profile updated successfully!'),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
+              if (nameController.text.isNotEmpty && nameController.text != profile.username) {
+                try {
+                  await ref.read(userProfileProvider.notifier).updateUsername(nameController.text);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Row(
+                          children: [
+                            Icon(Icons.check_circle, color: Colors.white),
+                            SizedBox(width: 12),
+                            Text('Profile updated successfully!'),
+                          ],
+                        ),
+                        backgroundColor: Colors.green,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(Icons.error, color: Colors.white),
+                            const SizedBox(width: 12),
+                            Expanded(child: Text('Failed to update: $e')),
+                          ],
+                        ),
+                        backgroundColor: Colors.red,
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    );
+                  }
                 }
               }
             },
-            child: const Text('Save'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primaryColor,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('Save Changes'),
           ),
         ],
       ),
@@ -288,11 +563,23 @@ class UserProfileMenu extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
           children: [
-            Icon(Icons.help_outline, color: AppColors.primaryColor),
-            SizedBox(width: 8),
-            Text('Help & Support'),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.teal.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(
+                Icons.help_outline,
+                color: Colors.teal,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text('Help & Support'),
           ],
         ),
         content: Column(
@@ -301,48 +588,98 @@ class UserProfileMenu extends ConsumerWidget {
           children: [
             const Text(
               'Need help? We\'re here for you!',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
             ),
-            const SizedBox(height: 16),
-            _buildHelpItem(Icons.email, 'Email: support@daypilot.com'),
-            _buildHelpItem(Icons.phone, 'Phone: +1 (555) 123-4567'),
-            _buildHelpItem(Icons.chat, 'Live Chat: Available 24/7'),
-            const SizedBox(height: 16),
-            const Text(
-              'Version 1.0.0',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+            const SizedBox(height: 20),
+            _buildHelpItem(Icons.email_rounded, 'support@daypilot.com', Colors.blue),
+            const SizedBox(height: 12),
+            _buildHelpItem(Icons.phone_rounded, '+1 (555) 123-4567', Colors.green),
+            const SizedBox(height: 12),
+            _buildHelpItem(Icons.chat_bubble_rounded, 'Live Chat: 24/7', Colors.purple),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.info_outline, size: 16, color: Colors.grey),
+                  SizedBox(width: 8),
+                  Text(
+                    'Version 1.0.0',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
         actions: [
-          TextButton(
+          ElevatedButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.teal,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('Got it!'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildHelpItem(IconData icon, String text) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+  Widget _buildHelpItem(IconData icon, String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: AppColors.primaryColor),
-          const SizedBox(width: 8),
-          Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
+          Icon(icon, size: 20, color: color),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 14,
+                color: color.withOpacity(0.9),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  void _showLogoutDialog(BuildContext context, WidgetRef ref) {
     if (!_isFirebaseInitialized()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Authentication not available'),
+        SnackBar(
+          content: const Row(
+            children: [
+              Icon(Icons.warning, color: Colors.white),
+              SizedBox(width: 12),
+              Text('Authentication not available'),
+            ],
+          ),
           behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );
       return;
@@ -351,25 +688,92 @@ class UserProfileMenu extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Icons.logout_rounded,
+                color: Colors.red[700],
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text('Logout'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.orange[50],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, color: Colors.orange[700]),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'Are you sure you want to logout?',
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.grey[600]),
+            ),
           ),
           ElevatedButton(
             onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              if (context.mounted) {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                  '/login',
-                  (route) => false,
-                );
+              try {
+                await FirebaseAuth.instance.signOut();
+                if (context.mounted) {
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/login',
+                    (route) => false,
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.error, color: Colors.white),
+                          const SizedBox(width: 12),
+                          Expanded(child: Text('Logout failed: $e')),
+                        ],
+                      ),
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  );
+                }
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: Colors.red[700],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: const Text('Logout'),
           ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:daypilot/utils/theme.dart';
 import 'package:daypilot/widgets/app_drawer.dart';
 import 'package:daypilot/services/haptic_service.dart';
 
