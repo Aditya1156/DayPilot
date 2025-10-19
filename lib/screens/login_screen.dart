@@ -285,15 +285,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
       print('🎉 Authentication completed successfully!');
       
-      // Force a small delay to ensure auth state propagates
-      await Future.delayed(const Duration(milliseconds: 200));
+      // Force a small delay to ensure auth state and SharedPreferences propagate
+      await Future.delayed(const Duration(milliseconds: 300));
       
       // Verify current user state
       final currentUser = FirebaseAuth.instance.currentUser;
       print('🔍 Current user after auth: ${currentUser?.uid ?? 'null'}');
       
-      // Don't navigate manually - let StreamBuilder handle it
-      // The auth state change will trigger navigation automatically
+      // Navigate to dashboard immediately after successful authentication
+      if (mounted && currentUser != null) {
+        print('🚀 Navigating to dashboard...');
+        Navigator.of(context).pushReplacementNamed('/dashboard');
+      }
     } on FirebaseAuthException catch (e) {
       print('❌ FirebaseAuthException: ${e.code} - ${e.message}');
       String message = 'Authentication failed';
