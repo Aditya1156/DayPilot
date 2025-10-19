@@ -101,32 +101,30 @@ class UserProfileMenu extends ConsumerWidget {
             ),
           ),
           itemBuilder: (context) => [
-            // Enhanced Profile Header with gradient
+            // Enhanced Profile Header — wider and more compact (row layout)
             PopupMenuItem<String>(
               enabled: false,
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Column(
+                width: 300,
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                child: Row(
                   children: [
-                    // Avatar with gradient border
+                    // Avatar with subtle gradient border (smaller)
                     Container(
-                      padding: const EdgeInsets.all(3),
+                      padding: const EdgeInsets.all(2),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
-                          colors: [
-                            AppColors.primaryColor,
-                            AppColors.accentColor,
-                          ],
+                          colors: [AppColors.primaryColor, AppColors.accentColor],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                       ),
                       child: CircleAvatar(
-                        radius: 36,
+                        radius: 28,
                         backgroundColor: Colors.white,
                         child: CircleAvatar(
-                          radius: 34,
+                          radius: 26,
                           backgroundColor: AppColors.primaryColor,
                           backgroundImage: photoUrl != null ? NetworkImage(photoUrl) : null,
                           child: photoUrl == null
@@ -135,52 +133,47 @@ class UserProfileMenu extends ConsumerWidget {
                                   style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 28,
+                                    fontSize: 20,
                                   ),
                                 )
                               : null,
                         ),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    // Name with better styling
-                    Text(
-                      displayName,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    // Email with icon
-                    if (email.isNotEmpty)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                    const SizedBox(width: 12),
+                    // Name + email stacked to the right
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            Icons.email_outlined,
-                            size: 14,
-                            color: Colors.grey[600],
-                          ),
-                          const SizedBox(width: 4),
-                          Flexible(
-                            child: Text(
-                              email,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.grey[600],
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
+                          Text(
+                            displayName,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
+                          const SizedBox(height: 4),
+                          if (email.isNotEmpty)
+                            Row(
+                              children: [
+                                Icon(Icons.email_outlined, size: 14, color: Colors.grey[600]),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    email,
+                                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
                         ],
                       ),
-                    const SizedBox(height: 12),
-                    Divider(height: 1, thickness: 1, color: Colors.grey[200]),
+                    ),
                   ],
                 ),
               ),
@@ -189,120 +182,75 @@ class UserProfileMenu extends ConsumerWidget {
             // Edit Profile with enhanced styling
             PopupMenuItem<String>(
               value: 'profile',
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
+              child: Container(
+                width: 300,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(Icons.person_outline, size: 18, color: AppColors.primaryColor),
                     ),
-                    child: Icon(
-                      Icons.person_outline,
-                      size: 20,
-                      color: AppColors.primaryColor,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Edit Profile',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    const Text('Edit Profile', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+                  ],
+                ),
               ),
             ),
             
             // Settings
             PopupMenuItem<String>(
               value: 'settings',
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
+              child: Container(
+                width: 300,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                      child: const Icon(Icons.settings_outlined, size: 18, color: Colors.blue),
                     ),
-                    child: const Icon(
-                      Icons.settings_outlined,
-                      size: 20,
-                      color: Colors.blue,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Settings',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    const Text('Settings', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+                  ],
+                ),
               ),
             ),
             
             // Dark Mode Toggle
             PopupMenuItem<String>(
               value: 'theme',
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-                      size: 20,
-                      color: Colors.orange,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    isDarkMode ? 'Light Mode' : 'Dark Mode',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+              child: Container(
+                width: 300,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(
+                  children: [
+                    Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(10)), child: Icon(isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined, size: 18, color: Colors.orange)),
+                    const SizedBox(width: 12),
+                    Text(isDarkMode ? 'Light Mode' : 'Dark Mode', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+                  ],
+                ),
               ),
             ),
             
             // Notifications
             PopupMenuItem<String>(
               value: 'notifications',
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.purple.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.notifications_outlined,
-                      size: 20,
-                      color: Colors.purple,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Notifications',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+              child: Container(
+                width: 300,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(
+                  children: [
+                    Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.notifications_outlined, size: 18, color: Colors.purple)),
+                    const SizedBox(width: 12),
+                    const Text('Notifications', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+                  ],
+                ),
               ),
             ),
             
@@ -311,61 +259,32 @@ class UserProfileMenu extends ConsumerWidget {
             // Help & Support
             PopupMenuItem<String>(
               value: 'help',
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.teal.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(
-                      Icons.help_outline,
-                      size: 20,
-                      color: Colors.teal,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Help & Support',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+              child: Container(
+                width: 300,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(
+                  children: [
+                    Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.teal.withOpacity(0.1), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.help_outline, size: 18, color: Colors.teal)),
+                    const SizedBox(width: 12),
+                    const Text('Help & Support', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+                  ],
+                ),
               ),
             ),
             
             // Logout with danger styling
             PopupMenuItem<String>(
               value: 'logout',
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      Icons.logout_rounded,
-                      size: 20,
-                      color: Colors.red[700],
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Logout',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.red[700],
-                    ),
-                  ),
-                ],
+              child: Container(
+                width: 300,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                child: Row(
+                  children: [
+                    Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(10)), child: Icon(Icons.logout_rounded, size: 18, color: Colors.red[700])),
+                    const SizedBox(width: 12),
+                    Text('Logout', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.red[700])),
+                  ],
+                ),
               ),
             ),
           ],
