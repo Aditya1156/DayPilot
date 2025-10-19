@@ -60,15 +60,24 @@ class _RemindersScreenState extends State<RemindersScreen> {
               spacing: 8,
               runSpacing: 8,
               children: reminderTypes.map((t) {
-                return ElevatedButton(
-                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10)),
-                  onPressed: () => _scheduleType(t['id']!),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(t['title']!, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      Text(t['desc']!, style: const TextStyle(fontSize: 12)),
-                    ],
+                return SizedBox(
+                  width: 160,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 2,
+                    ),
+                    onPressed: () => _scheduleType(t['id']!),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(t['title']!, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 4),
+                        Text(t['desc']!, style: const TextStyle(fontSize: 12, color: Colors.white70)),
+                      ],
+                    ),
                   ),
                 );
               }).toList(),
@@ -96,7 +105,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    const Text('Smart reminders support snooze, skip, and quick actions directly from the notification.'),
+                    Text('Smart reminders support snooze, skip, and quick actions directly from the notification.', style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.7))),
                   ],
                 ),
               ),

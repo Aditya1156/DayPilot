@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class RoutineBuilderScreen extends StatefulWidget {
   const RoutineBuilderScreen({super.key});
@@ -48,6 +49,26 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
     });
   }
 
+  // Persist/load routines using Hive
+  Future<void> _saveRoutineTemplate() async {
+    final box = await Hive.openBox('routines');
+    final id = DateTime.now().millisecondsSinceEpoch.toString();
+    await box.put(id, {'name': 'Template $id', 'items': routine, 'created': DateTime.now().toIso8601String()});
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Template saved')));
+  }
+
+  Future<void> _loadRoutineTemplate(String id) async {
+    final box = await Hive.openBox('routines');
+    final saved = box.get(id);
+    if (saved != null && saved['items'] is List) {
+      if (!mounted) return;
+      setState(() {
+        routine = List<Map<String, dynamic>>.from(saved['items']);
+      });
+    }
+  }
+
   void _generateFromAI() {
     // Placeholder - integrate real AI service during backend work
     setState(() {
@@ -66,20 +87,39 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Category palette
+            // Category palette (draggable chips)
             SizedBox(
-              height: 48,
+              height: 64,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: availableCategories.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
                 itemBuilder: (context, idx) {
                   final cat = availableCategories[idx];
-                  return ActionChip(
-                    label: Text(cat),
-                    onPressed: () => _addFromCategory(cat),
-                    backgroundColor: Colors.grey.shade50,
-                    elevation: 2,
+                  return Draggable<String>(
+                    data: cat,
+                    feedback: Material(
+                      color: Colors.transparent,
+                      child: Chip(
+                        label: Text(cat, style: const TextStyle(fontWeight: FontWeight.w600)),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+                      ),
+                    ),
+                    childWhenDragging: Opacity(
+                      opacity: 0.4,
+                      child: Chip(
+                        label: Text(cat, style: const TextStyle(fontWeight: FontWeight.w600)),
+                        backgroundColor: Colors.grey.shade100,
+                        side: BorderSide(color: Colors.grey.shade200),
+                      ),
+                    ),
+                    child: ActionChip(
+                      label: Text(cat, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      onPressed: () => _addFromCategory(cat),
+                      backgroundColor: Theme.of(context).colorScheme.surface,
+                      labelPadding: const EdgeInsets.symmetric(horizontal: 12),
+                    ),
                   );
                 },
               ),
@@ -99,52 +139,107 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
                       Text('Your Routine', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       Expanded(
-                        child: ReorderableListView.builder(
-                          itemCount: routine.length,
-                          onReorder: (oldIndex, newIndex) {
-                            setState(() {
-                              if (newIndex > oldIndex) newIndex -= 1;
-                              final item = routine.removeAt(oldIndex);
-                              routine.insert(newIndex, item);
-                            });
+                        child: DragTarget<String>(
+                          onAcceptWithDetails: (details) {
+                            _addFromCategory(details.data);
                           },
-                          itemBuilder: (context, index) {
-                            final item = routine[index];
-                            return ListTile(
-                              key: ValueKey(item['title'] + index.toString()),
-                              tileColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              leading: Container(
-                                width: 44,
-                                height: 44,
-                                decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(8)),
-                                child: Center(child: Text('${item['mins']}m', style: const TextStyle(fontWeight: FontWeight.bold))),
+                          builder: (context, candidateData, rejectedData) {
+                            final isActive = candidateData.isNotEmpty;
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 220),
+                              curve: Curves.easeOutCubic,
+                              decoration: BoxDecoration(
+                                color: isActive ? theme.colorScheme.primary.withOpacity(0.03) : Colors.transparent,
+                                borderRadius: BorderRadius.circular(12),
+                                border: isActive ? Border.all(color: theme.colorScheme.primary, width: 2) : Border.all(color: Colors.transparent),
                               ),
-                              title: Text(item['title']),
-                              subtitle: Text(item['category']),
-                              trailing: const Icon(Icons.drag_handle),
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: ReorderableListView.builder(
+                                physics: const BouncingScrollPhysics(),
+                                itemCount: routine.length,
+                                onReorder: (oldIndex, newIndex) {
+                                  setState(() {
+                                    if (newIndex > oldIndex) newIndex -= 1;
+                                    final item = routine.removeAt(oldIndex);
+                                    routine.insert(newIndex, item);
+                                  });
+                                },
+                                itemBuilder: (context, index) {
+                                  final item = routine[index];
+                                  final key = ValueKey('${item['title']}_$index');
+                                  return Container(
+                                    key: key,
+                                    margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+                                    child: Material(
+                                      color: Colors.white,
+                                      elevation: 1,
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: ListTile(
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                        leading: Container(
+                                          width: 48,
+                                          height: 48,
+                                          decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(10)),
+                                          child: Center(child: Text('${item['mins']}m', style: const TextStyle(fontWeight: FontWeight.bold))),
+                                        ),
+                                        title: Text(item['title'], style: const TextStyle(fontWeight: FontWeight.w600)),
+                                        subtitle: Text(item['category'], style: TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.7))),
+                                        trailing: ReorderableDragStartListener(
+                                          index: index,
+                                          child: Icon(Icons.drag_handle, color: Colors.grey.shade600),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                             );
                           },
                         ),
                       ),
                       const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          TextButton.icon(
-                            onPressed: _generateFromAI,
-                            icon: const Icon(Icons.auto_fix_high_outlined),
-                            label: const Text('Apply AI Suggestions'),
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              // Save routine flow - implement persistence
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Routine saved')));
-                            },
-                            icon: const Icon(Icons.save),
-                            label: const Text('Save Routine'),
-                          ),
-                        ],
+                      // Action row: AI + Save. Use Wrap so buttons don't overflow and respect SafeArea
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextButton.icon(
+                                onPressed: _generateFromAI,
+                                icon: const Icon(Icons.auto_fix_high_outlined),
+                                label: const Text('Apply AI Suggestions'),
+                                style: TextButton.styleFrom(foregroundColor: theme.colorScheme.primary),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton.icon(
+                              onPressed: _saveRoutineTemplate,
+                              icon: const Icon(Icons.save),
+                              label: const Text('Save Template'),
+                              style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
+                            ),
+                            const SizedBox(width: 8),
+                            PopupMenuButton<String>(
+                              icon: const Icon(Icons.folder_open),
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(value: 'load_latest', child: Text('Load latest template')),
+                              ],
+                              onSelected: (v) async {
+                                if (v == 'load_latest') {
+                                  // load latest template
+                                  final box = await Hive.openBox('routines');
+                                  if (box.isNotEmpty) {
+                                    final key = box.keys.last as String;
+                                    await _loadRoutineTemplate(key);
+                                  } else {
+                                    if (!mounted) return;
+                                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No templates saved yet')));
+                                  }
+                                }
+                              },
+                            )
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -155,7 +250,7 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
             const SizedBox(height: 12),
             // AI suggestions quick list
             SizedBox(
-              height: 90,
+              height: 110,
               child: Card(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: Padding(
@@ -170,14 +265,25 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
                           scrollDirection: Axis.horizontal,
                           itemCount: aiSuggestions.length,
                           separatorBuilder: (_, __) => const SizedBox(width: 8),
-                          itemBuilder: (context, i) => ActionChip(
-                            label: Text(aiSuggestions[i]),
-                            onPressed: () {
-                              setState(() {
-                                routine.insert(1, {'title': aiSuggestions[i], 'mins': 15, 'category': 'Personal Care'});
-                              });
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Suggestion added')));
-                            },
+                          itemBuilder: (context, i) => Card(
+                            elevation: 2,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  routine.insert(1, {'title': aiSuggestions[i], 'mins': 15, 'category': 'Personal Care'});
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Suggestion added')));
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                child: Row(children: [
+                                  const Icon(Icons.lightbulb, color: Colors.amber),
+                                  const SizedBox(width: 8),
+                                  SizedBox(width: 220, child: Text(aiSuggestions[i], maxLines: 2, overflow: TextOverflow.ellipsis)),
+                                ]),
+                              ),
+                            ),
                           ),
                         ),
                       ),

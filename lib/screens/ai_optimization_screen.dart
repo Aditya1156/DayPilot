@@ -73,14 +73,18 @@ class _AIOptimizationScreenState extends State<AIOptimizationScreen> {
               const SizedBox(height: 8),
               Expanded(
                 child: ListView.separated(
-                  itemCount: suggestions.length,
-                  separatorBuilder: (_, __) => const Divider(),
-                  itemBuilder: (context, idx) => ListTile(
-                    leading: const Icon(Icons.lightbulb_outline),
-                    title: Text(suggestions[idx]),
-                    trailing: IconButton(icon: const Icon(Icons.add), onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Added to routine')))),
+                    itemCount: suggestions.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, idx) => Card(
+                      elevation: 2,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: ListTile(
+                        leading: const Icon(Icons.lightbulb_outline, color: Colors.amber),
+                        title: Text(suggestions[idx]),
+                        trailing: IconButton(icon: const Icon(Icons.add), onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Added to routine')))),
+                      ),
+                    ),
                   ),
-                ),
               ),
             ] else ...[
               Expanded(child: Center(child: Text('No suggestions yet. Adjust parameters and tap Generate.'))),

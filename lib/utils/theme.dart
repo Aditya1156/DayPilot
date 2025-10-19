@@ -60,22 +60,25 @@ class AppTheme {
     ),
     cardTheme: CardThemeData(
       color: cardLight,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryBlue,
         foregroundColor: Colors.white,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        elevation: 2,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         textStyle: GoogleFonts.inter(
-          fontSize: 16,
+          fontSize: 15,
           fontWeight: FontWeight.w600,
         ),
       ),
     ),
+    scaffoldBackgroundColor: backgroundLight,
+    shadowColor: primaryBlue.withOpacity(0.12),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: primaryBlue,
       foregroundColor: Colors.white,
@@ -116,22 +119,25 @@ class AppTheme {
     ),
     cardTheme: CardThemeData(
       color: cardDark,
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryBlue,
         foregroundColor: Colors.white,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        elevation: 2,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         textStyle: GoogleFonts.inter(
-          fontSize: 16,
+          fontSize: 15,
           fontWeight: FontWeight.w600,
         ),
       ),
     ),
+    scaffoldBackgroundColor: backgroundDark,
+    shadowColor: primaryBlue.withOpacity(0.12),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
       backgroundColor: primaryBlue,
       foregroundColor: Colors.white,

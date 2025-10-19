@@ -74,6 +74,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 onRefresh: () async {
                   await _hapticService.lightImpact();
                   await Future.delayed(const Duration(milliseconds: 500));
+                  if (!mounted) return;
                   setState(() {});
                 },
                 child: CustomScrollView(
@@ -112,6 +113,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                   icon: const Icon(Icons.search),
                   onPressed: () async {
                     await _hapticService.lightImpact();
+                    if (!mounted) return;
                     showSearch(
                       context: context,
                       delegate: TaskSearchDelegate(tasks),

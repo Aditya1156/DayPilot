@@ -24,13 +24,15 @@ class AnalyticsScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Column(
                         children: [
                           Text('Completion', style: theme.textTheme.bodySmall),
                           const SizedBox(height: 8),
-                          Text('${(completionRate * 100).round()}%', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+                          Text('${(completionRate * 100).round()}%', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary)),
                         ],
                       ),
                     ),
@@ -39,13 +41,15 @@ class AnalyticsScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Column(
                         children: [
                           Text('Focus Hours', style: theme.textTheme.bodySmall),
                           const SizedBox(height: 8),
-                          Text('${avgFocusHours.toStringAsFixed(1)}h', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+                          Text('${avgFocusHours.toStringAsFixed(1)}h', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.tertiary)),
                         ],
                       ),
                     ),
@@ -54,13 +58,15 @@ class AnalyticsScreen extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: Column(
                         children: [
                           Text('Streak', style: theme.textTheme.bodySmall),
                           const SizedBox(height: 8),
-                          Text('$streakDays days', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+                          Text('$streakDays days', style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.secondary)),
                         ],
                       ),
                     ),
