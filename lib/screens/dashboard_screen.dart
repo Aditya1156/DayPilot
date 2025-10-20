@@ -10,6 +10,8 @@ import 'package:daypilot/widgets/ai_suggestion_card.dart';
 import 'package:daypilot/widgets/app_drawer.dart';
 import 'package:daypilot/widgets/motivational_quote_card.dart';
 import 'package:daypilot/widgets/task_search_delegate.dart';
+import 'package:daypilot/widgets/animated_stat_card.dart';
+import 'package:daypilot/widgets/productivity_score_widget.dart';
 import 'package:daypilot/services/haptic_service.dart';
 import 'package:intl/intl.dart';
 import 'package:confetti/confetti.dart';
@@ -143,13 +145,73 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     ),
                     const SizedBox(height: 24),
 
+                    // Stats Overview Row
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AnimatedStatCard(
+                            title: 'Completed',
+                            value: '$completedTasks/${tasks.length}',
+                            icon: Icons.check_circle,
+                            color: const Color(0xFF10B981),
+                            progress: progress,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: AnimatedStatCard(
+                            title: 'Streak',
+                            value: '${tasks.where((t) => t.status == TaskStatus.completed).length}',
+                            icon: Icons.local_fire_department,
+                            color: const Color(0xFFF59E0B),
+                            subtitle: 'days',
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: AnimatedStatCard(
+                            title: 'Pending',
+                            value: '${tasks.where((t) => t.status != TaskStatus.completed).length}',
+                            icon: Icons.pending_actions,
+                            color: const Color(0xFF3B82F6),
+                            subtitle: 'tasks',
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: AnimatedStatCard(
+                            title: 'Progress',
+                            value: '${(progress * 100).toInt()}%',
+                            icon: Icons.trending_up,
+                            color: const Color(0xFF8B5CF6),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Productivity Score
+                    ProductivityScoreWidget(
+                      score: _calculateProductivityScore(tasks),
+                      breakdown: {
+                        'Task Completion': progress,
+                        'On-Time Completion': _calculateOnTimeRate(tasks),
+                        'Consistency': _calculateConsistency(tasks),
+                      },
+                    ),
+                    const SizedBox(height: 24),
+
                     // Morning Section
                     _buildTimeSection(
                       context: context,
                       title: '🌅 Morning',
                       subtitle: 'Start your day right',
                       tasks: _getTasksForTimeRange(tasks, 6, 12),
-                      color: AppTheme.primaryBlue,
+                      color: AppTheme.primaryPeach,
                     ),
                     
                     // Afternoon Section
@@ -158,7 +220,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       title: '☀️ Afternoon',
                       subtitle: 'Stay productive',
                       tasks: _getTasksForTimeRange(tasks, 12, 18),
-                      color: AppTheme.accentYellow,
+                      color: AppTheme.accentBeige,
                     ),
                     
                     // Evening Section
@@ -167,7 +229,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       title: '🌙 Evening',
                       subtitle: 'Wind down and reflect',
                       tasks: _getTasksForTimeRange(tasks, 18, 24),
-                      color: AppTheme.secondaryPurple,
+                      color: AppTheme.lilacSoft,
                     ),
                     
                     // All Tasks Summary
@@ -206,13 +268,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     const AISuggestionCard(
                       suggestion: "Shift your lunch earlier by 15 mins for better energy levels this afternoon.",
                       icon: Icons.lightbulb,
-                      color: AppTheme.accentYellow,
+                      color: AppTheme.accentBeige,
                     ),
                     const SizedBox(height: 12),
                     const AISuggestionCard(
                       suggestion: "Based on your sleep data, consider moving your workout to 7:30 AM tomorrow.",
                       icon: Icons.fitness_center,
-                      color: AppTheme.tertiaryGreen,
+                      color: AppTheme.mintSoft,
                     ),
                   ],
                 ),
@@ -244,10 +306,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               Navigator.pushNamed(context, '/reminders');
               break;
             case 3:
-              Navigator.pushNamed(context, '/ai');
+              Navigator.pushNamed(context, '/ai-assistant');
               break;
             case 4:
-              Navigator.pushNamed(context, '/analytics');
+              Navigator.pushNamed(context, '/analytics-enhanced');
               break;
           }
         },
@@ -437,7 +499,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<TaskCategory>(
-                  value: selectedCategory,
+                  initialValue: selectedCategory,
                   decoration: const InputDecoration(
                     labelText: 'Category',
                     border: OutlineInputBorder(),
@@ -595,7 +657,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<TaskCategory>(
-                  value: selectedCategory,
+                  initialValue: selectedCategory,
                   decoration: const InputDecoration(
                     labelText: 'Category',
                     border: OutlineInputBorder(),
@@ -1049,7 +1111,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         crossAxisCount: 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: 1.2,
+        childAspectRatio: 0.95,
       ),
       itemCount: tasks.length,
       itemBuilder: (context, index) {
@@ -1194,5 +1256,36 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         );
       },
     );
+  }
+
+  // Productivity calculation methods
+  double _calculateProductivityScore(List<Task> tasks) {
+    if (tasks.isEmpty) return 0.0;
+    
+    final completedTasks = tasks.where((t) => t.status == TaskStatus.completed).length;
+    final completionRate = completedTasks / tasks.length;
+    
+    // Simple productivity score based on completion rate and task count
+    return (completionRate * 100).clamp(0, 100);
+  }
+
+  double _calculateOnTimeRate(List<Task> tasks) {
+    if (tasks.isEmpty) return 0.0;
+    
+    final completedTasks = tasks.where((t) => t.status == TaskStatus.completed).length;
+    if (completedTasks == 0) return 0.0;
+    
+    // Simulate 80% on-time completion for demo purposes
+    return 0.8;
+  }
+
+  double _calculateConsistency(List<Task> tasks) {
+    if (tasks.isEmpty) return 0.0;
+    
+    final completedTasks = tasks.where((t) => t.status == TaskStatus.completed).length;
+    final rate = completedTasks / tasks.length;
+    
+    // Slightly lower than completion rate to show room for improvement
+    return (rate * 0.85).clamp(0, 1);
   }
 }

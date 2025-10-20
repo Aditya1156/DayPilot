@@ -148,7 +148,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             // Non-critical, continue with login
             if (mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text(
                       'Profile sync incomplete. Please check your connection.'),
                   backgroundColor: Colors.orange,
@@ -412,7 +412,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               decoration: InputDecoration(
                 labelText: 'Email',
                 prefixIcon:
-                    Icon(Icons.email_outlined, color: AppColors.primaryColor),
+                    const Icon(Icons.email_outlined, color: AppColors.primaryColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -562,7 +562,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             ),
           ],
         ),
-        child: Stack(
+        child: const Stack(
           alignment: Alignment.center,
           children: [
             Icon(
@@ -699,7 +699,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: _handleForgotPassword,
-                    child: Text(
+                    child: const Text(
                       'Forgot Password?',
                       style: TextStyle(color: AppColors.primaryColor),
                     ),
@@ -771,7 +771,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                     onPressed: _toggleAuthMode,
                     child: Text(
                       _isLogin ? 'Sign Up' : 'Sign In',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: AppColors.primaryColor,
                         fontWeight: FontWeight.w600,
                       ),
@@ -814,7 +814,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+          borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

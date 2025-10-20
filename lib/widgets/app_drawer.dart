@@ -13,14 +13,14 @@ class AppDrawer extends ConsumerWidget {
     final userProfileAsync = ref.watch(userProfileProvider);
     
     return Drawer(
-      child: Container(
+            child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppTheme.primaryBlue.withOpacity(0.1),
-              AppTheme.secondaryPurple.withOpacity(0.1),
+              AppTheme.primaryPeach.withOpacity(0.08),
+              AppTheme.lilacSoft.withOpacity(0.06),
             ],
           ),
         ),
@@ -38,7 +38,7 @@ class AppDrawer extends ConsumerWidget {
                       data: (profile) => Column(
                         children: [
                           // Small padding around the profile menu so it looks like an avatar in header
-                          Align(
+                          const Align(
                             alignment: Alignment.center,
                             child: UserProfileMenu(),
                           ),
@@ -86,12 +86,12 @@ class AppDrawer extends ConsumerWidget {
                       ),
                       error: (_, __) => Column(
                         children: [
-                          Align(
+                          const Align(
                             alignment: Alignment.center,
                             child: CircleAvatar(
                               radius: 40,
-                              backgroundColor: AppTheme.primaryBlue,
-                              child: const Icon(
+                              backgroundColor: AppTheme.primaryPeach,
+                              child: Icon(
                                 Icons.person,
                                 size: 40,
                                 color: Colors.white,
@@ -116,9 +116,9 @@ class AppDrawer extends ConsumerWidget {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
+                        gradient: const LinearGradient(
                           colors: [
-                            AppTheme.accentYellow,
+                            AppTheme.accentBeige,
                             Colors.orange,
                           ],
                         ),
@@ -160,7 +160,7 @@ class AppDrawer extends ConsumerWidget {
                       title: 'Dashboard',
                       subtitle: 'Today\'s overview',
                       route: '/',
-                      color: AppTheme.primaryBlue,
+                      color: AppTheme.primaryPeach,
                     ),
                     _buildMenuItem(
                       context,
@@ -168,7 +168,7 @@ class AppDrawer extends ConsumerWidget {
                       title: 'Routines',
                       subtitle: 'Daily schedules',
                       route: '/routines',
-                      color: AppTheme.secondaryPurple,
+                      color: AppTheme.lilacSoft,
                     ),
                     _buildMenuItem(
                       context,
@@ -176,7 +176,7 @@ class AppDrawer extends ConsumerWidget {
                       title: 'Reminders',
                       subtitle: 'Notifications',
                       route: '/reminders',
-                      color: AppTheme.accentYellow,
+                      color: AppTheme.accentBeige,
                     ),
                     _buildMenuItem(
                       context,
@@ -184,7 +184,7 @@ class AppDrawer extends ConsumerWidget {
                       title: 'AI Insights',
                       subtitle: 'Smart suggestions',
                       route: '/ai',
-                      color: AppTheme.tertiaryGreen,
+                      color: AppTheme.mintSoft,
                     ),
                     _buildMenuItem(
                       context,
@@ -352,7 +352,7 @@ class AppDrawer extends ConsumerWidget {
         Icon(
           icon,
           size: 20,
-          color: AppTheme.primaryBlue,
+          color: AppTheme.primaryPeach,
         ),
         const SizedBox(height: 4),
         Text(

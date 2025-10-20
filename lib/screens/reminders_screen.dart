@@ -26,7 +26,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
   TimeOfDay _selectedTime = TimeOfDay.now();
   String _repeatOption = 'Once';
   final List<String> _repeatOptions = ['Once', 'Daily', 'Weekdays', 'Weekends', 'Custom'];
-  bool _smartSuggestionsEnabled = true;
+  final bool _smartSuggestionsEnabled = true;
 
   Future<void> _pickTime() async {
     final t = await showTimePicker(context: context, initialTime: _selectedTime);
@@ -139,8 +139,8 @@ class _RemindersScreenState extends State<RemindersScreen> {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  TextField(
-                    decoration: const InputDecoration(
+                  const TextField(
+                    decoration: InputDecoration(
                       hintText: 'Reminder message',
                       prefixIcon: Icon(Icons.edit_note),
                       contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -162,7 +162,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: DropdownButtonFormField<String>(
-                          value: _repeatOption,
+                          initialValue: _repeatOption,
                           decoration: const InputDecoration(
                             contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                             prefixIcon: Icon(Icons.repeat),

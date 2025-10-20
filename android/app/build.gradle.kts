@@ -51,7 +51,9 @@ android {
                 signingConfig = signingConfigs.create("release").apply {
                     keyAlias = keystoreProperties.getProperty("keyAlias")
                     keyPassword = keystoreProperties.getProperty("keyPassword")
-                    storeFile = file(keystoreProperties.getProperty("storeFile"))
+                    // Resolve the keystore file relative to the android project root so
+                    // `storeFile=app/key.jks` in key.properties maps to android/app/key.jks
+                    storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
                     storePassword = keystoreProperties.getProperty("storePassword")
                 }
             } else {

@@ -205,7 +205,7 @@ class AnalyticsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            Expanded(child: Center(child: Text('Charts and deeper analytics will be integrated here.'))),
+            const Expanded(child: Center(child: Text('Charts and deeper analytics will be integrated here.'))),
           ],
         ),
       ),

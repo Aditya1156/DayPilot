@@ -43,6 +43,12 @@ class Task extends HiveObject {
   final DateTime endTime;
   @HiveField(6)
   TaskStatus status;
+  @HiveField(7)
+  final String? rrule; // optional recurrence rule in a simple text form (e.g., "FREQ=DAILY;INTERVAL=1")
+  @HiveField(8)
+  final int? lastScheduledOccurrenceMillis;
+  @HiveField(9)
+  final int reminderOffsetMinutes; // minutes before occurrence to remind (default 10)
 
   Task({
     required this.id,
@@ -52,6 +58,9 @@ class Task extends HiveObject {
     required this.startTime,
     required this.endTime,
     this.status = TaskStatus.pending,
+    this.rrule,
+    this.lastScheduledOccurrenceMillis,
+    this.reminderOffsetMinutes = 10,
   });
 
   // Get color based on category
@@ -92,6 +101,9 @@ class Task extends HiveObject {
       'startTime': startTime.millisecondsSinceEpoch,
       'endTime': endTime.millisecondsSinceEpoch,
       'status': status.toString(),
+      'rrule': rrule,
+      'lastScheduledOccurrence': lastScheduledOccurrenceMillis,
+      'reminderOffsetMinutes': reminderOffsetMinutes,
     };
   }
 
@@ -111,6 +123,35 @@ class Task extends HiveObject {
         (e) => e.toString() == map['status'],
         orElse: () => TaskStatus.pending,
       ),
+      rrule: map['rrule'],
+      lastScheduledOccurrenceMillis: map['lastScheduledOccurrence'] is int ? map['lastScheduledOccurrence'] as int : (map['lastScheduledOccurrence'] is String ? int.tryParse(map['lastScheduledOccurrence']) : null),
+      reminderOffsetMinutes: map['reminderOffsetMinutes'] is int ? map['reminderOffsetMinutes'] as int : (map['reminderOffsetMinutes'] is String ? int.tryParse(map['reminderOffsetMinutes']) ?? 10 : 10),
+    );
+  }
+
+  Task copyWith({
+    String? id,
+    String? title,
+    String? description,
+    TaskCategory? category,
+    DateTime? startTime,
+    DateTime? endTime,
+    TaskStatus? status,
+    String? rrule,
+    int? lastScheduledOccurrenceMillis,
+    int? reminderOffsetMinutes,
+  }) {
+    return Task(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      category: category ?? this.category,
+      startTime: startTime ?? this.startTime,
+      endTime: endTime ?? this.endTime,
+      status: status ?? this.status,
+      rrule: rrule ?? this.rrule,
+      lastScheduledOccurrenceMillis: lastScheduledOccurrenceMillis ?? this.lastScheduledOccurrenceMillis,
+      reminderOffsetMinutes: reminderOffsetMinutes ?? this.reminderOffsetMinutes,
     );
   }
 }

@@ -112,7 +112,7 @@ class UserProfileMenu extends ConsumerWidget {
                     // Avatar with subtle gradient border (smaller)
                     Container(
                       padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         gradient: LinearGradient(
                           colors: [AppColors.primaryColor, AppColors.accentColor],
@@ -193,7 +193,7 @@ class UserProfileMenu extends ConsumerWidget {
                         color: AppColors.primaryColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Icon(Icons.person_outline, size: 18, color: AppColors.primaryColor),
+                      child: const Icon(Icons.person_outline, size: 18, color: AppColors.primaryColor),
                     ),
                     const SizedBox(width: 12),
                     const Text('Edit Profile', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
@@ -254,7 +254,7 @@ class UserProfileMenu extends ConsumerWidget {
               ),
             ),
             
-            PopupMenuDivider(height: 1),
+            const PopupMenuDivider(height: 1),
             
             // Help & Support
             PopupMenuItem<String>(
@@ -357,7 +357,7 @@ class UserProfileMenu extends ConsumerWidget {
                 color: AppColors.primaryColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(
+              child: const Icon(
                 Icons.person_outline,
                 color: AppColors.primaryColor,
                 size: 24,
@@ -375,13 +375,13 @@ class UserProfileMenu extends ConsumerWidget {
               decoration: InputDecoration(
                 labelText: 'Display Name',
                 hintText: 'Enter your name',
-                prefixIcon: Icon(Icons.badge_outlined, color: AppColors.primaryColor),
+                prefixIcon: const Icon(Icons.badge_outlined, color: AppColors.primaryColor),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+                  borderSide: const BorderSide(color: AppColors.primaryColor, width: 2),
                 ),
                 filled: true,
                 fillColor: Colors.grey[50],

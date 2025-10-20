@@ -128,7 +128,7 @@ class _AIOptimizationScreenState extends State<AIOptimizationScreen> {
                             const Text('Work Style', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
                             const SizedBox(height: 6),
                             DropdownButtonFormField<String>(
-                              value: workStyle,
+                              initialValue: workStyle,
                               decoration: const InputDecoration(
                                 contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                               ),
@@ -146,7 +146,7 @@ class _AIOptimizationScreenState extends State<AIOptimizationScreen> {
                             const Text('Daily hours', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
                             const SizedBox(height: 6),
                             DropdownButtonFormField<int>(
-                              value: dailyAvailableHours,
+                              initialValue: dailyAvailableHours,
                               decoration: const InputDecoration(
                                 contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                               ),
@@ -164,7 +164,7 @@ class _AIOptimizationScreenState extends State<AIOptimizationScreen> {
                     title: const Text('Prefer morning sessions', style: TextStyle(fontSize: 13)),
                     value: preferMorning,
                     onChanged: (v) => setState(() => preferMorning = v),
-                    activeColor: theme.colorScheme.primary,
+                    activeThumbColor: theme.colorScheme.primary,
                   ),
                   const SizedBox(height: 8),
                   SizedBox(
@@ -201,7 +201,7 @@ class _AIOptimizationScreenState extends State<AIOptimizationScreen> {
                   ),
               ),
             ] else ...[
-              Expanded(child: Center(child: Text('No suggestions yet. Adjust parameters and tap Generate.'))),
+              const Expanded(child: Center(child: Text('No suggestions yet. Adjust parameters and tap Generate.'))),
             ],
           ],
         ),

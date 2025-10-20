@@ -3,15 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 
 // App Colors - Optimized professional palette with better contrast
 class AppColors {
-  // Primary palette - Modern blues with depth
-  static const Color primaryColor = Color(0xFF2E7EF0);
-  static const Color primaryDark = Color(0xFF1E5FBF);
-  static const Color primaryLight = Color(0xFF5BA3FF);
-  
-  // Secondary & accent colors
-  static const Color secondaryColor = Color(0xFF7C3AED);
-  static const Color accentColor = Color(0xFFFBB040);
-  static const Color tertiaryColor = Color(0xFF10B981);
+  // Primary palette - Pastel peach/pink brand
+  static const Color primaryColor = Color(0xFFF6C6BB); // soft peach
+  static const Color primaryDark = Color(0xFFDDAAA0);
+  static const Color primaryLight = Color(0xFFFFEDEB);
+
+  // Secondary & accent colors (complementary)
+  static const Color secondaryColor = Color(0xFFB7E3D8); // soft mint
+  static const Color accentColor = Color(0xFFFAD9B8); // warm yellow-beige
+  static const Color tertiaryColor = Color(0xFFBDA4F8); // soft lilac
   
   // Status colors
   static const Color successColor = Color(0xFF06D6A0);
@@ -34,17 +34,20 @@ class AppColors {
 class AppTheme {
   // Optimized color palette with better depth
   static const Color primaryBlue = Color(0xFF2E7EF0);
-  static const Color accentYellow = Color(0xFFFBB040);
-  static const Color secondaryPurple = Color(0xFF7C3AED);
-  static const Color tertiaryGreen = Color(0xFF10B981);
+  // Brand pastel palette
+  static const Color primaryPeach = Color(0xFFF6C6BB);
+  static const Color primaryPeachDark = Color(0xFFDDAAA0);
+  static const Color accentBeige = Color(0xFFFAD9B8);
+  static const Color mintSoft = Color(0xFFB7E3D8);
+  static const Color lilacSoft = Color(0xFFBDA4F8);
   
-  static const Color backgroundLight = Color(0xFFF5F7FA);
+  static const Color backgroundLight = Color(0xFFFFFBFA); // very light warm
   static const Color backgroundDark = Color(0xFF0F172A);
   
   static const Color textDark = Color(0xFF1E293B);
   static const Color textLight = Color(0xFFF1F5F9);
   
-  static const Color cardLight = Color(0xFFFFFFFF);
+  static const Color cardLight = Color(0xFFFFFEFD); // tiny warm tint
   static const Color cardDark = Color(0xFF1E293B);
   
   // Gradient colors for surfaces
@@ -55,10 +58,10 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    colorScheme: ColorScheme.light(
-      primary: primaryBlue,
-      secondary: secondaryPurple,
-      tertiary: tertiaryGreen,
+    colorScheme: const ColorScheme.light(
+      primary: primaryPeach,
+      secondary: mintSoft,
+      tertiary: lilacSoft,
       surface: cardLight,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
@@ -74,7 +77,7 @@ class AppTheme {
         fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
-      iconTheme: const IconThemeData(color: primaryBlue),
+      iconTheme: const IconThemeData(color: textDark),
     ),
     cardTheme: CardThemeData(
       color: cardLight,
@@ -84,7 +87,7 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: primaryBlue,
+  backgroundColor: primaryPeach,
         foregroundColor: Colors.white,
         elevation: 2,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -96,16 +99,16 @@ class AppTheme {
       ),
     ),
     scaffoldBackgroundColor: backgroundLight,
-    shadowColor: primaryBlue.withAlpha(30),
+    shadowColor: primaryPeach.withAlpha(30),
     dividerColor: textDark.withAlpha(20),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: primaryBlue,
+      backgroundColor: primaryPeach,
       foregroundColor: Colors.white,
       elevation: 4,
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: cardLight,
-      selectedItemColor: primaryBlue,
+      selectedItemColor: primaryPeach,
       unselectedItemColor: Color(0xFF64748B),
       type: BottomNavigationBarType.fixed,
       elevation: 8,
@@ -123,7 +126,7 @@ class AppTheme {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: primaryBlue, width: 2),
+  borderSide: const BorderSide(color: primaryPeach, width: 2),
       ),
     ),
   );
@@ -132,10 +135,10 @@ class AppTheme {
   static ThemeData darkTheme = ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
-    colorScheme: ColorScheme.dark(
-      primary: primaryBlue,
-      secondary: secondaryPurple,
-      tertiary: tertiaryGreen,
+    colorScheme: const ColorScheme.dark(
+      primary: primaryPeach,
+      secondary: mintSoft,
+      tertiary: lilacSoft,
       surface: cardDark,
       onPrimary: Colors.white,
       onSecondary: Colors.white,
@@ -151,7 +154,7 @@ class AppTheme {
         fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
-      iconTheme: const IconThemeData(color: primaryBlue),
+      iconTheme: const IconThemeData(color: textLight),
     ),
     cardTheme: CardThemeData(
       color: cardDark,
@@ -161,7 +164,7 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: primaryBlue,
+  backgroundColor: primaryPeach,
         foregroundColor: Colors.white,
         elevation: 2,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -173,16 +176,16 @@ class AppTheme {
       ),
     ),
     scaffoldBackgroundColor: backgroundDark,
-    shadowColor: primaryBlue.withAlpha(30),
+    shadowColor: primaryPeach.withAlpha(30),
     dividerColor: textLight.withAlpha(20),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: primaryBlue,
+      backgroundColor: primaryPeach,
       foregroundColor: Colors.white,
       elevation: 4,
     ),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
       backgroundColor: cardDark,
-      selectedItemColor: primaryBlue,
+      selectedItemColor: primaryPeach,
       unselectedItemColor: Color(0xFF94A3B8),
       type: BottomNavigationBarType.fixed,
       elevation: 8,
@@ -200,7 +203,7 @@ class AppTheme {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: primaryBlue, width: 2),
+  borderSide: const BorderSide(color: primaryPeach, width: 2),
       ),
     ),
   );

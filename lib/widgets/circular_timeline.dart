@@ -29,7 +29,7 @@ class CircularTimeline extends StatelessWidget {
               value: progress,
               strokeWidth: 12,
               backgroundColor: Colors.grey.withOpacity(0.2),
-              valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primaryBlue),
+              valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primaryPeach),
             ),
           ),
           
@@ -37,7 +37,7 @@ class CircularTimeline extends StatelessWidget {
           ...List.generate(tasks.length, (index) {
             // Calculate position on the circle
             final angle = 2 * pi * (index / tasks.length);
-            final radius = 85.0; // Slightly smaller than the progress indicator
+            const radius = 85.0; // Slightly smaller than the progress indicator
             final x = radius * cos(angle);
             final y = radius * sin(angle);
             
@@ -79,7 +79,7 @@ class CircularTimeline extends StatelessWidget {
                 '${(progress * 100).toInt()}%',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.primaryBlue,
+                  color: AppTheme.primaryPeach,
                 ),
               ),
               Text(

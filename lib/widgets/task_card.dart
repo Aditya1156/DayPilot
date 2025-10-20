@@ -54,9 +54,10 @@ class TaskCard extends StatelessWidget {
               onTap: onTap,
               borderRadius: BorderRadius.circular(20),
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(12.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                         // Header with category and status (constrained to prevent overflow)
                         Row(
@@ -144,7 +145,7 @@ class TaskCard extends StatelessWidget {
                       ),
                     ],
 
-                    const Spacer(),
+                    const SizedBox(height: 8),
 
                     // Time and duration
                     Row(

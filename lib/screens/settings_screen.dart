@@ -62,7 +62,7 @@ class SettingsScreen extends StatelessWidget {
           
           const Divider(),
           const _SectionHeader(title: 'About'),
-          _SettingTile(
+          const _SettingTile(
             icon: Icons.info,
             title: 'Version',
             subtitle: '1.0.0',

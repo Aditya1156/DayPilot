@@ -21,7 +21,9 @@ import 'package:daypilot/screens/achievements_screen.dart';
 import 'package:daypilot/screens/social_screen.dart';
 import 'package:daypilot/screens/voice_commands_screen.dart';
 import 'package:daypilot/screens/settings_screen.dart';
-import 'package:daypilot/utils/theme.dart';
+import 'package:daypilot/screens/ai_assistant_screen.dart';
+import 'package:daypilot/screens/enhanced_analytics_screen.dart';
+import 'package:daypilot/utils/modern_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -68,9 +70,9 @@ class DayPilotApp extends StatelessWidget {
     return MaterialApp(
       title: 'DayPilot',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      theme: ModernTheme.getLightTheme(),
+      darkTheme: ModernTheme.getDarkTheme(),
+      themeMode: ThemeMode.light,
       home: const AuthWrapper(),
       // Register named routes for the main feature pages
       routes: {
@@ -79,7 +81,9 @@ class DayPilotApp extends StatelessWidget {
         '/routines': (context) => const RoutineBuilderScreen(),
         '/reminders': (context) => const RemindersScreen(),
         '/ai': (context) => const AIOptimizationScreen(),
+        '/ai-assistant': (context) => const AIAssistantScreen(),
         '/analytics': (context) => const AnalyticsScreen(),
+        '/analytics-enhanced': (context) => const EnhancedAnalyticsScreen(),
         '/chat': (context) => const ChatAssistantScreen(),
         '/achievements': (context) => const AchievementsScreen(),
         '/social': (context) => const SocialScreen(),
