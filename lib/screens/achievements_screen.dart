@@ -18,8 +18,8 @@ class AchievementsScreen extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.amber.withOpacity(0.1),
-              Colors.orange.withOpacity(0.1),
+              Colors.amber.withAlpha((0.1 * 255).round()),
+              Colors.orange.withAlpha((0.1 * 255).round()),
             ],
           ),
         ),
@@ -88,7 +88,7 @@ class AchievementsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isUnlocked ? color : Colors.grey.withOpacity(0.3),
+                color: isUnlocked ? color : Colors.grey.withAlpha((0.3 * 255).round()),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -116,7 +116,7 @@ class AchievementsScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   LinearProgressIndicator(
                     value: progress,
-                    backgroundColor: Colors.grey.withOpacity(0.2),
+                    backgroundColor: Colors.grey.withAlpha((0.2 * 255).round()),
                     valueColor: AlwaysStoppedAnimation<Color>(color),
                   ),
                   const SizedBox(height: 4),

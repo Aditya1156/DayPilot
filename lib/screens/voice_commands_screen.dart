@@ -301,19 +301,19 @@ class _VoiceCommandsScreenState extends ConsumerState<VoiceCommandsScreen>
           children: [
             // Outer pulse ring
             if (_isListening)
-              Container(
-                width: 220 * scale,
-                height: 220 * scale,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      ModernTheme.primaryPurple.withOpacity(opacity),
-                      ModernTheme.primaryPurple.withOpacity(0),
-                    ],
+                Container(
+                  width: 220 * scale,
+                  height: 220 * scale,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        ModernTheme.primaryPurple.withAlpha((opacity * 255).round()),
+                        ModernTheme.primaryPurple.withAlpha((0 * 255).round()),
+                      ],
+                    ),
                   ),
                 ),
-              ),
             
             // Middle ring
             Container(
@@ -322,10 +322,10 @@ class _VoiceCommandsScreenState extends ConsumerState<VoiceCommandsScreen>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  colors: [
-                    ModernTheme.primaryPurple.withOpacity(0.2),
-                    ModernTheme.primaryBlue.withOpacity(0.2),
-                  ],
+                    colors: [
+                      ModernTheme.primaryPurple.withAlpha((0.2 * 255).round()),
+                      ModernTheme.primaryBlue.withAlpha((0.2 * 255).round()),
+                    ],
                 ),
               ),
             ),
@@ -338,13 +338,13 @@ class _VoiceCommandsScreenState extends ConsumerState<VoiceCommandsScreen>
                 gradient: _isListening ? ModernTheme.primaryGradient : LinearGradient(
                   colors: [
                     ModernTheme.textLight,
-                    ModernTheme.textLight.withOpacity(0.8),
+                    ModernTheme.textLight.withAlpha((0.8 * 255).round()),
                   ],
                 ),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: (_isListening ? ModernTheme.primaryPurple : ModernTheme.textLight).withOpacity(0.4),
+                    color: (_isListening ? ModernTheme.primaryPurple : ModernTheme.textLight).withAlpha((0.4 * 255).round()),
                     blurRadius: 20,
                     spreadRadius: 5,
                   ),
@@ -501,10 +501,10 @@ class _VoiceCommandsScreenState extends ConsumerState<VoiceCommandsScreen>
               color: (cmd.success ? ModernTheme.successGreen : ModernTheme.errorRed).withOpacity(0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(
-              cmd.success ? Icons.check : Icons.close,
-              color: cmd.success ? ModernTheme.successGreen : ModernTheme.errorRed,
-            ),
+              child: Icon(
+                cmd.success ? Icons.check : Icons.close,
+                color: cmd.success ? ModernTheme.successGreen : ModernTheme.errorRed.withAlpha((0.1 * 255).round()),
+              ),
           ),
           const SizedBox(width: 12),
           Expanded(

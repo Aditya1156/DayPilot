@@ -50,14 +50,14 @@ class TaskSearchDelegate extends SearchDelegate<Task?> {
             Icon(
               Icons.search,
               size: 64,
-              color: theme.colorScheme.primary.withOpacity(0.5),
+              color: theme.colorScheme.primary.withAlpha((0.5 * 255).round()),
             ),
             const SizedBox(height: 16),
             Text(
               'Search for tasks',
               style: theme.textTheme.titleLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-              ),
+                  color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
+                ),
             ),
           ],
         ),
@@ -78,20 +78,20 @@ class TaskSearchDelegate extends SearchDelegate<Task?> {
             Icon(
               Icons.search_off,
               size: 64,
-              color: theme.colorScheme.error.withOpacity(0.5),
+              color: theme.colorScheme.error.withAlpha((0.5 * 255).round()),
             ),
             const SizedBox(height: 16),
             Text(
               'No tasks found',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                style: theme.textTheme.titleLarge?.copyWith(
+                color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'Try a different search term',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withAlpha((0.5 * 255).round()),
               ),
             ),
           ],
@@ -150,6 +150,8 @@ class TaskSearchDelegate extends SearchDelegate<Task?> {
         return Colors.green;
       case TaskCategory.study:
         return Colors.orange;
+      case TaskCategory.others:
+        return Colors.grey;
     }
   }
 
@@ -163,6 +165,8 @@ class TaskSearchDelegate extends SearchDelegate<Task?> {
         return Icons.favorite;
       case TaskCategory.study:
         return Icons.school;
+      case TaskCategory.others:
+        return Icons.more_horiz;
     }
   }
 }

@@ -19,27 +19,34 @@ class _TaskEditorScreenState extends ConsumerState<TaskEditorScreen> {
   DateTime _end = DateTime.now().add(const Duration(hours: 1));
   String? _rrule;
   int _reminderOffsetMinutes = 10;
+  int _estimatedDurationMinutes = 60;
   String? _taskId;
 
   @override
   void initState() {
     super.initState();
+    // Avoid using BuildContext across async gaps inside initState.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final args = ModalRoute.of(context)?.settings.arguments;
+      final localRef = ref;
+      final route = ModalRoute.of(context);
+      final args = route?.settings.arguments;
       if (args is String) {
         final id = args;
-        final tasks = ref.read(tasksProvider);
+        final tasks = localRef.read(tasksProvider);
         final matches = tasks.where((t) => t.id == id);
-          if (matches.isNotEmpty) {
+        if (matches.isNotEmpty) {
           final match = matches.first;
-          _taskId = match.id;
-          _titleCtrl.text = match.title;
-          _descCtrl.text = match.description ?? '';
-          _category = match.category;
-          _start = match.startTime;
-          _end = match.endTime;
+          setState(() {
+            _taskId = match.id;
+            _titleCtrl.text = match.title;
+            _descCtrl.text = match.description ?? '';
+            _category = match.category;
+            _start = match.startTime;
+            _end = match.endTime;
             _rrule = match.rrule;
             _reminderOffsetMinutes = match.reminderOffsetMinutes;
+            _estimatedDurationMinutes = match.estimatedDurationMinutes;
+          });
         }
       }
     });
@@ -53,14 +60,15 @@ class _TaskEditorScreenState extends ConsumerState<TaskEditorScreen> {
   }
 
   Future<void> _pickStart() async {
+    final localContext = context;
     final dt = await showDatePicker(
-      context: context,
+      context: localContext,
       initialDate: _start,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
     if (dt == null) return;
-    final t = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(_start));
+    final t = await showTimePicker(context: localContext, initialTime: TimeOfDay.fromDateTime(_start));
     if (t == null) return;
     setState(() {
       _start = DateTime(dt.year, dt.month, dt.day, t.hour, t.minute);
@@ -69,14 +77,15 @@ class _TaskEditorScreenState extends ConsumerState<TaskEditorScreen> {
   }
 
   Future<void> _pickEnd() async {
+    final localContext = context;
     final dt = await showDatePicker(
-      context: context,
+      context: localContext,
       initialDate: _end,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
     if (dt == null) return;
-    final t = await showTimePicker(context: context, initialTime: TimeOfDay.fromDateTime(_end));
+    final t = await showTimePicker(context: localContext, initialTime: TimeOfDay.fromDateTime(_end));
     if (t == null) return;
     setState(() {
       _end = DateTime(dt.year, dt.month, dt.day, t.hour, t.minute);
@@ -96,6 +105,7 @@ class _TaskEditorScreenState extends ConsumerState<TaskEditorScreen> {
       status: TaskStatus.pending,
       rrule: _rrule,
       reminderOffsetMinutes: _reminderOffsetMinutes,
+      estimatedDurationMinutes: _estimatedDurationMinutes,
     );
 
     if (_taskId == null) {
@@ -144,6 +154,18 @@ class _TaskEditorScreenState extends ConsumerState<TaskEditorScreen> {
                     value: _reminderOffsetMinutes,
                     items: const [0, 5, 10, 15, 30, 60].map((m) => DropdownMenuItem(value: m, child: Text(m == 0 ? 'At time' : '\${m}m before'))).toList(),
                     onChanged: (v) => setState(() { _reminderOffsetMinutes = v ?? 10; }),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Expanded(child: Text('Estimated duration')),
+                  const SizedBox(width: 8),
+                  DropdownButton<int>(
+                    value: _estimatedDurationMinutes,
+                    items: const [15, 30, 45, 60, 90, 120].map((m) => DropdownMenuItem(value: m, child: Text('\${m}m'))).toList(),
+                    onChanged: (v) => setState(() { _estimatedDurationMinutes = v ?? 60; }),
                   ),
                 ],
               ),

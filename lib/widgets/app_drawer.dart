@@ -11,16 +11,16 @@ class AppDrawer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final userProfileAsync = ref.watch(userProfileProvider);
-    
+
     return Drawer(
-            child: Container(
+      child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppTheme.primaryPeach.withOpacity(0.08),
-              AppTheme.lilacSoft.withOpacity(0.06),
+              AppTheme.primaryPeach.withAlpha((0.08 * 255).round()),
+              AppTheme.lilacSoft.withAlpha((0.06 * 255).round()),
             ],
           ),
         ),
@@ -37,7 +37,6 @@ class AppDrawer extends ConsumerWidget {
                     userProfileAsync.when(
                       data: (profile) => Column(
                         children: [
-                          // Small padding around the profile menu so it looks like an avatar in header
                           const Align(
                             alignment: Alignment.center,
                             child: UserProfileMenu(),
@@ -52,7 +51,7 @@ class AppDrawer extends ConsumerWidget {
                           Text(
                             profile?.email ?? '',
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.7),
+                              color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
                             ),
                           ),
                         ],
@@ -146,9 +145,9 @@ class AppDrawer extends ConsumerWidget {
                   ],
                 ),
               ),
-              
+
               const Divider(),
-              
+
               // Menu Items
               Expanded(
                 child: ListView(
@@ -169,6 +168,14 @@ class AppDrawer extends ConsumerWidget {
                       subtitle: 'Daily schedules',
                       route: '/routines',
                       color: AppTheme.lilacSoft,
+                    ),
+                    _buildMenuItem(
+                      context,
+                      icon: Icons.notifications,
+                      title: 'Notifications',
+                      subtitle: 'Notification settings',
+                      route: '/settings',
+                      color: Colors.purple,
                     ),
                     _buildMenuItem(
                       context,
@@ -194,9 +201,9 @@ class AppDrawer extends ConsumerWidget {
                       route: '/analytics',
                       color: Colors.blue,
                     ),
-                    
+
                     const Divider(),
-                    
+
                     _buildMenuItem(
                       context,
                       icon: Icons.emoji_events,
@@ -232,7 +239,7 @@ class AppDrawer extends ConsumerWidget {
                   ],
                 ),
               ),
-              
+
               // Footer
               Container(
                 padding: const EdgeInsets.all(16),
@@ -267,7 +274,7 @@ class AppDrawer extends ConsumerWidget {
                     Text(
                       'DayPilot v1.0.0',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.5),
+                        color: theme.colorScheme.onSurface.withAlpha((0.5 * 255).round()),
                       ),
                     ),
                   ],
@@ -290,20 +297,18 @@ class AppDrawer extends ConsumerWidget {
   }) {
     final theme = Theme.of(context);
     final isCurrentRoute = ModalRoute.of(context)?.settings.name == route;
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: isCurrentRoute
-            ? color.withOpacity(0.1)
-            : Colors.transparent,
+        color: isCurrentRoute ? color.withAlpha((0.1 * 255).round()) : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.2),
+            color: color.withAlpha((0.2 * 255).round()),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
@@ -346,7 +351,7 @@ class AppDrawer extends ConsumerWidget {
     required String label,
   }) {
     final theme = Theme.of(context);
-    
+
     return Column(
       children: [
         Icon(

@@ -23,21 +23,21 @@ class TaskCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
           colors: [
-            task.categoryColor.withOpacity(0.12),
-            task.categoryColor.withOpacity(0.05),
+            task.categoryColor.withAlpha((0.12 * 255).round()),
+            task.categoryColor.withAlpha((0.05 * 255).round()),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: task.categoryColor.withOpacity(0.06),
+            color: task.categoryColor.withAlpha((0.06 * 255).round()),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
         ],
         border: Border.all(
-          color: Colors.white.withOpacity(0.12),
+          color: Colors.white.withAlpha((0.12 * 255).round()),
           width: 1,
         ),
       ),
@@ -46,10 +46,11 @@ class TaskCard extends StatelessWidget {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface.withOpacity(0.8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface.withAlpha((0.8 * 255).round()),
               borderRadius: BorderRadius.circular(20),
             ),
+            
             child: InkWell(
               onTap: onTap,
               borderRadius: BorderRadius.circular(20),
@@ -67,10 +68,10 @@ class TaskCard extends StatelessWidget {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: task.categoryColor.withOpacity(0.18),
+                                  color: task.categoryColor.withAlpha((0.18 * 255).round()),
                                   borderRadius: BorderRadius.circular(10),
                                   border: Border.all(
-                                    color: task.categoryColor.withOpacity(0.25),
+                                    color: task.categoryColor.withAlpha((0.25 * 255).round()),
                                     width: 1,
                                   ),
                                 ),
@@ -136,8 +137,8 @@ class TaskCard extends StatelessWidget {
                         constraints: const BoxConstraints(maxHeight: 40),
                         child: Text(
                           task.description!,
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.7),
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurface.withAlpha((0.6 * 255).round()),
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -153,14 +154,14 @@ class TaskCard extends StatelessWidget {
                         Icon(
                           Icons.access_time,
                           size: 14,
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withAlpha((0.6 * 255).round()),
                         ),
                         const SizedBox(width: 6),
                         Flexible(
                           child: Text(
                             '${timeFormat.format(task.startTime)} - ${timeFormat.format(task.endTime)}',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.6),
+                              color: theme.colorScheme.onSurface.withAlpha((0.6 * 255).round()),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -183,8 +184,8 @@ class TaskCard extends StatelessWidget {
       case TaskStatus.completed:
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.green.withOpacity(0.1),
+            decoration: BoxDecoration(
+            color: Colors.green.withAlpha((0.1 * 255).round()),
             borderRadius: BorderRadius.circular(12),
           ),
           child: const Row(
@@ -209,8 +210,8 @@ class TaskCard extends StatelessWidget {
       case TaskStatus.inProgress:
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.blue.withOpacity(0.1),
+            decoration: BoxDecoration(
+            color: Colors.blue.withAlpha((0.1 * 255).round()),
             borderRadius: BorderRadius.circular(12),
           ),
           child: const Row(
@@ -235,8 +236,8 @@ class TaskCard extends StatelessWidget {
       case TaskStatus.missed:
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.red.withOpacity(0.1),
+            decoration: BoxDecoration(
+            color: Colors.red.withAlpha((0.1 * 255).round()),
             borderRadius: BorderRadius.circular(12),
           ),
           child: const Row(
@@ -261,8 +262,8 @@ class TaskCard extends StatelessWidget {
       case TaskStatus.pending:
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.1),
+            decoration: BoxDecoration(
+            color: Colors.grey.withAlpha((0.1 * 255).round()),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(

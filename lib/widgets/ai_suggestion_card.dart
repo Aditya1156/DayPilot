@@ -22,26 +22,26 @@ class AISuggestionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
           colors: [
-            color.withOpacity(0.15),
-            color.withOpacity(0.08),
+            color.withAlpha((0.15 * 255).round()),
+            color.withAlpha((0.08 * 255).round()),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.1),
+            color: color.withAlpha((0.1 * 255).round()),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
           BoxShadow(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withAlpha((0.1 * 255).round()),
             blurRadius: 20,
             offset: const Offset(0, -8),
           ),
         ],
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withAlpha((0.2 * 255).round()),
           width: 1,
         ),
       ),
@@ -50,8 +50,8 @@ class AISuggestionCard extends StatelessWidget {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface.withOpacity(0.8),
+              decoration: BoxDecoration(
+              color: theme.colorScheme.surface.withAlpha((0.8 * 255).round()),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Padding(
@@ -69,10 +69,10 @@ class AISuggestionCard extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.2),
+                            color: color.withAlpha((0.2 * 255).round()),
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: color.withOpacity(0.3),
+                              color: color.withAlpha((0.3 * 255).round()),
                               width: 1,
                             ),
                           ),

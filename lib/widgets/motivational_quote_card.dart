@@ -102,17 +102,17 @@ class _MotivationalQuoteCardState extends State<MotivationalQuoteCard> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+            gradient: LinearGradient(
           colors: [
-            theme.colorScheme.primary.withOpacity(0.1),
-            theme.colorScheme.secondary.withOpacity(0.05),
+            theme.colorScheme.primary.withAlpha((0.1 * 255).round()),
+            theme.colorScheme.secondary.withAlpha((0.05 * 255).round()),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.2),
+          color: theme.colorScheme.primary.withAlpha((0.2 * 255).round()),
           width: 1,
         ),
       ),
@@ -127,7 +127,7 @@ class _MotivationalQuoteCardState extends State<MotivationalQuoteCard> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withAlpha((0.1 * 255).round()),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -158,11 +158,11 @@ class _MotivationalQuoteCardState extends State<MotivationalQuoteCard> {
                           borderRadius: BorderRadius.circular(4),
                           child: Padding(
                             padding: const EdgeInsets.all(4),
-                            child: Icon(
-                              Icons.refresh,
-                              size: 16,
-                              color: theme.colorScheme.onSurface.withOpacity(0.6),
-                            ),
+                              child: Icon(
+                                Icons.refresh,
+                                size: 16,
+                                color: theme.colorScheme.onSurface.withAlpha((0.6 * 255).round()),
+                              ),
                           ),
                         ),
                       ],
@@ -171,7 +171,7 @@ class _MotivationalQuoteCardState extends State<MotivationalQuoteCard> {
                     Text(
                       '"${currentQuote['quote'] ?? ''}"',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.8),
+                        color: theme.colorScheme.onSurface.withAlpha((0.8 * 255).round()),
                         height: 1.4,
                         fontStyle: FontStyle.italic,
                       ),
@@ -182,7 +182,7 @@ class _MotivationalQuoteCardState extends State<MotivationalQuoteCard> {
                     Text(
                       '— ${currentQuote['author'] ?? ''}',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                        color: theme.colorScheme.onSurface.withAlpha((0.6 * 255).round()),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -199,7 +199,7 @@ class _MotivationalQuoteCardState extends State<MotivationalQuoteCard> {
                   child: Icon(
                     Icons.close,
                     size: 16,
-                    color: theme.colorScheme.onSurface.withOpacity(0.4),
+                      color: theme.colorScheme.onSurface.withAlpha((0.4 * 255).round()),
                   ),
                 ),
               ),

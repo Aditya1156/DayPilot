@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'package:daypilot/models/task.dart';
 import 'package:daypilot/services/notification_service.dart';
+import 'package:daypilot/services/scheduler_service.dart';
 import 'package:daypilot/screens/login_screen.dart';
 import 'package:daypilot/screens/onboarding_screen.dart';
 import 'package:daypilot/screens/username_setup_screen.dart';
@@ -38,6 +39,12 @@ Future<void> main() async {
 
   // Initialize notifications
   await NotificationService.initialize();
+  // Schedule pending tasks (recurrence-aware) after notifications and Hive are ready
+  try {
+    // Ensure scheduler is run once at startup
+    await Future.delayed(const Duration(milliseconds: 50));
+    await SchedulerService.schedulePendingTasks();
+  } catch (_) {}
 
   // Initialize Firebase with proper options
   try {

@@ -343,14 +343,14 @@ Would you like me to help you create a specific routine or analyze your current 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha((0.05 * 255).round()),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
       ),
       child: Row(
         children: [
@@ -412,50 +412,50 @@ Would you like me to help you create a specific routine or analyze your current 
       height: 140,
       margin: const EdgeInsets.symmetric(vertical: 16),
       child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        itemCount: _quickPrompts.length,
-        itemBuilder: (context, index) {
-          final prompt = _quickPrompts[index];
-          return GestureDetector(
-            onTap: () => _sendMessage(prompt['prompt']),
-            child: Container(
-              width: 160,
-              margin: const EdgeInsets.only(right: 12),
-              decoration: BoxDecoration(
-                gradient: prompt['gradient'],
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: (prompt['gradient'] as LinearGradient).colors[0].withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Icon(
-                    prompt['icon'],
-                    color: Colors.white,
-                    size: 32,
-                  ),
-                  Text(
-                    prompt['title'],
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          itemCount: _quickPrompts.length,
+          itemBuilder: (context, index) {
+            final prompt = _quickPrompts[index];
+            return GestureDetector(
+              onTap: () => _sendMessage(prompt['prompt']),
+              child: Container(
+                width: 160,
+                margin: const EdgeInsets.only(right: 12),
+                decoration: BoxDecoration(
+                  gradient: prompt['gradient'],
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: (prompt['gradient'] as LinearGradient).colors[0].withAlpha((0.3 * 255).round()),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Icon(
+                      prompt['icon'],
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                    Text(
+                      prompt['title'],
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
       ),
     );
   }
@@ -470,18 +470,18 @@ Would you like me to help you create a specific routine or analyze your current 
         ),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: message.isUser 
-              ? ModernTheme.primaryGradient 
-              : null,
-          color: message.isUser ? null : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+            gradient: message.isUser 
+                ? ModernTheme.primaryGradient 
+                : null,
+            color: message.isUser ? null : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha((0.05 * 255).round()),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
         ),
         child: Text(
           message.text,
@@ -502,15 +502,15 @@ Would you like me to help you create a specific routine or analyze your current 
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha((0.05 * 255).round()),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
         ),
         child: AnimatedBuilder(
           animation: _typingController,
@@ -545,12 +545,12 @@ Would you like me to help you create a specific routine or analyze your current 
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
+            BoxShadow(
+              color: Colors.black.withAlpha((0.05 * 255).round()),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
       ),
       child: Row(
         children: [

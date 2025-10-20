@@ -78,7 +78,7 @@ class UserProfileMenu extends ConsumerWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primaryColor.withOpacity(0.3),
+                  color: AppColors.primaryColor.withAlpha((0.3 * 255).round()),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -190,7 +190,7 @@ class UserProfileMenu extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppColors.primaryColor.withOpacity(0.1),
+                        color: AppColors.primaryColor.withAlpha((0.1 * 255).round()),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(Icons.person_outline, size: 18, color: AppColors.primaryColor),
@@ -212,7 +212,7 @@ class UserProfileMenu extends ConsumerWidget {
                   children: [
                     Container(
                       padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(10)),
+                      decoration: BoxDecoration(color: Colors.blue.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(10)),
                       child: const Icon(Icons.settings_outlined, size: 18, color: Colors.blue),
                     ),
                     const SizedBox(width: 12),
@@ -230,7 +230,7 @@ class UserProfileMenu extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Row(
                   children: [
-                    Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.orange.withOpacity(0.1), borderRadius: BorderRadius.circular(10)), child: Icon(isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined, size: 18, color: Colors.orange)),
+                    Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.orange.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(10)), child: Icon(isDarkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined, size: 18, color: Colors.orange)),
                     const SizedBox(width: 12),
                     Text(isDarkMode ? 'Light Mode' : 'Dark Mode', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
                   ],
@@ -238,21 +238,7 @@ class UserProfileMenu extends ConsumerWidget {
               ),
             ),
             
-            // Notifications
-            PopupMenuItem<String>(
-              value: 'notifications',
-              child: Container(
-                width: 300,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                child: Row(
-                  children: [
-                    Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.purple.withOpacity(0.1), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.notifications_outlined, size: 18, color: Colors.purple)),
-                    const SizedBox(width: 12),
-                    const Text('Notifications', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
-                  ],
-                ),
-              ),
-            ),
+            // Notifications moved to sidebar drawer for easier access
             
             const PopupMenuDivider(height: 1),
             
@@ -264,7 +250,7 @@ class UserProfileMenu extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Row(
                   children: [
-                    Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.teal.withOpacity(0.1), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.help_outline, size: 18, color: Colors.teal)),
+                    Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.teal.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.help_outline, size: 18, color: Colors.teal)),
                     const SizedBox(width: 12),
                     const Text('Help & Support', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
                   ],
@@ -280,7 +266,7 @@ class UserProfileMenu extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 child: Row(
                   children: [
-                    Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), borderRadius: BorderRadius.circular(10)), child: Icon(Icons.logout_rounded, size: 18, color: Colors.red[700])),
+                    Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.red.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(10)), child: Icon(Icons.logout_rounded, size: 18, color: Colors.red[700])),
                     const SizedBox(width: 12),
                     Text('Logout', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.red[700])),
                   ],
@@ -296,7 +282,7 @@ class UserProfileMenu extends ConsumerWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
+              color: Colors.grey.withAlpha((0.3 * 255).round()),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -321,7 +307,7 @@ class UserProfileMenu extends ConsumerWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.red.withOpacity(0.3),
+              color: Colors.red.withAlpha((0.3 * 255).round()),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -354,7 +340,7 @@ class UserProfileMenu extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.primaryColor.withOpacity(0.1),
+                color: AppColors.primaryColor.withAlpha((0.1 * 255).round()),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
@@ -488,7 +474,7 @@ class UserProfileMenu extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.teal.withOpacity(0.1),
+                color: Colors.teal.withAlpha((0.1 * 255).round()),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const Icon(
@@ -563,9 +549,9 @@ class UserProfileMenu extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withAlpha((0.1 * 255).round()),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withAlpha((0.3 * 255).round())),
       ),
       child: Row(
         children: [
@@ -576,7 +562,7 @@ class UserProfileMenu extends ConsumerWidget {
               text,
               style: TextStyle(
                 fontSize: 14,
-                color: color.withOpacity(0.9),
+                color: color.withAlpha((0.9 * 255).round()),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -613,7 +599,7 @@ class UserProfileMenu extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withAlpha((0.1 * 255).round()),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(

@@ -232,12 +232,12 @@ class _AnalyticsScreenEnhancedState extends ConsumerState<AnalyticsScreenEnhance
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
+          colors: [color.withAlpha((0.1 * 255).round()), color.withAlpha((0.05 * 255).round())],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3)),
+  border: Border.all(color: color.withAlpha((0.3 * 255).round())),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -250,7 +250,7 @@ class _AnalyticsScreenEnhancedState extends ConsumerState<AnalyticsScreenEnhance
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: color.withAlpha((0.2 * 255).round()),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -277,7 +277,7 @@ class _AnalyticsScreenEnhancedState extends ConsumerState<AnalyticsScreenEnhance
               Text(
                 title,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
                 ),
               ),
             ],
@@ -329,7 +329,7 @@ class _AnalyticsScreenEnhancedState extends ConsumerState<AnalyticsScreenEnhance
             dotData: const FlDotData(show: true),
             belowBarData: BarAreaData(
               show: true,
-              color: theme.colorScheme.primary.withOpacity(0.1),
+              color: theme.colorScheme.primary.withAlpha((0.1 * 255).round()),
             ),
           ),
         ],
@@ -382,9 +382,9 @@ class _AnalyticsScreenEnhancedState extends ConsumerState<AnalyticsScreenEnhance
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+  color: color.withAlpha((0.1 * 255).round()),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
+  border: Border.all(color: color.withAlpha((0.3 * 255).round())),
       ),
       child: Row(
         children: [
@@ -410,7 +410,7 @@ class _AnalyticsScreenEnhancedState extends ConsumerState<AnalyticsScreenEnhance
                 Text(
                   message,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
                   ),
                 ),
               ],

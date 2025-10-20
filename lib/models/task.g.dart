@@ -24,13 +24,17 @@ class TaskAdapter extends TypeAdapter<Task> {
       startTime: fields[4] as DateTime,
       endTime: fields[5] as DateTime,
       status: fields[6] as TaskStatus,
+      rrule: fields[7] as String?,
+      lastScheduledOccurrenceMillis: fields[8] as int?,
+      reminderOffsetMinutes: (fields[9] as int?) ?? 10,
+      estimatedDurationMinutes: (fields[10] as int?) ?? 60,
     );
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -44,7 +48,15 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(5)
       ..write(obj.endTime)
       ..writeByte(6)
-      ..write(obj.status);
+      ..write(obj.status)
+      ..writeByte(7)
+      ..write(obj.rrule)
+      ..writeByte(8)
+      ..write(obj.lastScheduledOccurrenceMillis)
+      ..writeByte(9)
+      ..write(obj.reminderOffsetMinutes)
+      ..writeByte(10)
+      ..write(obj.estimatedDurationMinutes);
   }
 
   @override
@@ -122,6 +134,8 @@ class TaskCategoryAdapter extends TypeAdapter<TaskCategory> {
         return TaskCategory.study;
       case 3:
         return TaskCategory.personal;
+      case 4:
+        return TaskCategory.others;
       default:
         return TaskCategory.work;
     }
@@ -141,6 +155,9 @@ class TaskCategoryAdapter extends TypeAdapter<TaskCategory> {
         break;
       case TaskCategory.personal:
         writer.writeByte(3);
+        break;
+      case TaskCategory.others:
+        writer.writeByte(4);
         break;
     }
   }

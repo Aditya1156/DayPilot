@@ -42,8 +42,8 @@ class EmptyStateWidget extends StatelessWidget {
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
                         colors: [
-                          theme.colorScheme.primary.withOpacity(0.2),
-                          theme.colorScheme.secondary.withOpacity(0.2),
+                          theme.colorScheme.primary.withAlpha((0.2 * 255).round()),
+                          theme.colorScheme.secondary.withAlpha((0.2 * 255).round()),
                         ],
                       ),
                     ),
@@ -83,8 +83,8 @@ class EmptyStateWidget extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
               ),
             ),
             

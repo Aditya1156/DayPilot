@@ -24,7 +24,9 @@ enum TaskCategory {
   @HiveField(2)
   study,
   @HiveField(3)
-  personal,
+    personal,
+    @HiveField(4)
+    others,
 }
 
 @HiveType(typeId: 2)
@@ -47,6 +49,8 @@ class Task extends HiveObject {
   final String? rrule; // optional recurrence rule in a simple text form (e.g., "FREQ=DAILY;INTERVAL=1")
   @HiveField(8)
   final int? lastScheduledOccurrenceMillis;
+  @HiveField(10)
+  final int estimatedDurationMinutes; // estimated duration in minutes (default 60)
   @HiveField(9)
   final int reminderOffsetMinutes; // minutes before occurrence to remind (default 10)
 
@@ -61,6 +65,7 @@ class Task extends HiveObject {
     this.rrule,
     this.lastScheduledOccurrenceMillis,
     this.reminderOffsetMinutes = 10,
+    this.estimatedDurationMinutes = 60,
   });
 
   // Get color based on category
@@ -74,6 +79,8 @@ class Task extends HiveObject {
         return const Color(0xFF8338EC); // Purple
       case TaskCategory.personal:
         return const Color(0xFFFFBE0B); // Yellow
+      case TaskCategory.others:
+        return const Color(0xFF9E9E9E); // Grey
     }
   }
 
@@ -88,6 +95,8 @@ class Task extends HiveObject {
         return Icons.school;
       case TaskCategory.personal:
         return Icons.person;
+      case TaskCategory.others:
+        return Icons.more_horiz;
     }
   }
 
@@ -126,6 +135,7 @@ class Task extends HiveObject {
       rrule: map['rrule'],
       lastScheduledOccurrenceMillis: map['lastScheduledOccurrence'] is int ? map['lastScheduledOccurrence'] as int : (map['lastScheduledOccurrence'] is String ? int.tryParse(map['lastScheduledOccurrence']) : null),
       reminderOffsetMinutes: map['reminderOffsetMinutes'] is int ? map['reminderOffsetMinutes'] as int : (map['reminderOffsetMinutes'] is String ? int.tryParse(map['reminderOffsetMinutes']) ?? 10 : 10),
+      estimatedDurationMinutes: map['estimatedDurationMinutes'] is int ? map['estimatedDurationMinutes'] as int : (map['estimatedDurationMinutes'] is String ? int.tryParse(map['estimatedDurationMinutes']) ?? 60 : 60),
     );
   }
 
@@ -140,6 +150,7 @@ class Task extends HiveObject {
     String? rrule,
     int? lastScheduledOccurrenceMillis,
     int? reminderOffsetMinutes,
+    int? estimatedDurationMinutes,
   }) {
     return Task(
       id: id ?? this.id,
@@ -152,6 +163,7 @@ class Task extends HiveObject {
       rrule: rrule ?? this.rrule,
       lastScheduledOccurrenceMillis: lastScheduledOccurrenceMillis ?? this.lastScheduledOccurrenceMillis,
       reminderOffsetMinutes: reminderOffsetMinutes ?? this.reminderOffsetMinutes,
+      estimatedDurationMinutes: estimatedDurationMinutes ?? this.estimatedDurationMinutes,
     );
   }
 }

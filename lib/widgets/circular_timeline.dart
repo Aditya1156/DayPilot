@@ -28,7 +28,7 @@ class CircularTimeline extends StatelessWidget {
             child: CircularProgressIndicator(
               value: progress,
               strokeWidth: 12,
-              backgroundColor: Colors.grey.withOpacity(0.2),
+                backgroundColor: Colors.grey.withAlpha((0.2 * 255).round()),
               valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primaryPeach),
             ),
           ),
@@ -56,7 +56,7 @@ class CircularTimeline extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withAlpha((0.1 * 255).round()),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),

@@ -69,20 +69,20 @@ class _AnimatedStatCardState extends State<AnimatedStatCard>
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              widget.color.withOpacity(0.15),
-              widget.color.withOpacity(0.05),
+              widget.color.withAlpha((0.15 * 255).round()),
+              widget.color.withAlpha((0.05 * 255).round()),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: widget.color.withOpacity(0.3),
+            color: widget.color.withAlpha((0.3 * 255).round()),
             width: 1.5,
           ),
           boxShadow: [
             BoxShadow(
-              color: widget.color.withOpacity(0.1),
+              color: widget.color.withAlpha((0.1 * 255).round()),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -96,8 +96,8 @@ class _AnimatedStatCardState extends State<AnimatedStatCard>
               Positioned.fill(
                 child: CustomPaint(
                   painter: _PatternPainter(
-                    color: widget.color.withOpacity(0.05),
-                  ),
+                        color: widget.color.withAlpha((0.05 * 255).round()),
+                      ),
                 ),
               ),
               
@@ -111,7 +111,7 @@ class _AnimatedStatCardState extends State<AnimatedStatCard>
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: widget.color.withOpacity(0.2),
+                            color: widget.color.withAlpha((0.2 * 255).round()),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Icon(
@@ -152,7 +152,7 @@ class _AnimatedStatCardState extends State<AnimatedStatCard>
                     Text(
                       widget.title,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -174,7 +174,7 @@ class _AnimatedStatCardState extends State<AnimatedStatCard>
                       Text(
                         widget.subtitle!,
                         style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withAlpha((0.6 * 255).round()),
                         ),
                       ),
                     ],
@@ -203,9 +203,9 @@ class _ProgressRingPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2 - 3;
 
-    // Background ring
-    final bgPaint = Paint()
-      ..color = color.withOpacity(0.2)
+      // Background ring
+      final bgPaint = Paint()
+        ..color = color.withAlpha((0.2 * 255).round())
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3
       ..strokeCap = StrokeCap.round;
@@ -213,8 +213,8 @@ class _ProgressRingPainter extends CustomPainter {
     canvas.drawCircle(center, radius, bgPaint);
 
     // Progress ring
-    final progressPaint = Paint()
-      ..color = color
+      final progressPaint = Paint()
+        ..color = color.withAlpha((1.0 * 255).round())
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3
       ..strokeCap = StrokeCap.round;

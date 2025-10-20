@@ -61,15 +61,15 @@ class _ProductivityScoreWidgetState extends State<ProductivityScoreWidget>
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            _getScoreColor(widget.score).withOpacity(0.1),
-            _getScoreColor(widget.score).withOpacity(0.05),
+            _getScoreColor(widget.score).withAlpha((0.1 * 255).round()),
+            _getScoreColor(widget.score).withAlpha((0.05 * 255).round()),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: _getScoreColor(widget.score).withOpacity(0.3),
+          color: _getScoreColor(widget.score).withAlpha((0.3 * 255).round()),
           width: 2,
         ),
       ),
@@ -110,7 +110,7 @@ class _ProductivityScoreWidgetState extends State<ProductivityScoreWidget>
                         Text(
                           'out of 100',
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface.withAlpha((0.6 * 255).round()),
                           ),
                         ),
                       ],
@@ -153,7 +153,7 @@ class _ProductivityScoreWidgetState extends State<ProductivityScoreWidget>
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: entry.value,
-                      backgroundColor: theme.colorScheme.onSurface.withOpacity(0.1),
+                      backgroundColor: theme.colorScheme.onSurface.withAlpha((0.1 * 255).round()),
                       valueColor: AlwaysStoppedAnimation(
                         _getScoreColor(entry.value * 100),
                       ),
@@ -186,7 +186,7 @@ class _ScoreRingPainter extends CustomPainter {
 
     // Background ring
     final bgPaint = Paint()
-      ..color = color.withOpacity(0.15)
+      ..color = color.withAlpha((0.15 * 255).round())
       ..style = PaintingStyle.stroke
       ..strokeWidth = 18
       ..strokeCap = StrokeCap.round;
@@ -201,7 +201,7 @@ class _ScoreRingPainter extends CustomPainter {
       final gradient = SweepGradient(
         colors: [
           color,
-          color.withOpacity(0.6),
+          color.withAlpha((0.6 * 255).round()),
         ],
         stops: const [0.0, 1.0],
         startAngle: -math.pi / 2,
@@ -224,7 +224,7 @@ class _ScoreRingPainter extends CustomPainter {
 
       // Glow effect
       final glowPaint = Paint()
-        ..color = color.withOpacity(0.3)
+        ..color = color.withAlpha((0.3 * 255).round())
         ..style = PaintingStyle.stroke
         ..strokeWidth = 22
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);

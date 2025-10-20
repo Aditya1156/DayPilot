@@ -145,8 +145,8 @@ class _TodayScreenEnhancedState extends ConsumerState<TodayScreenEnhanced>
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        theme.colorScheme.primary.withOpacity(0.1),
-                        theme.colorScheme.secondary.withOpacity(0.05),
+                        theme.colorScheme.primary.withAlpha((0.1 * 255).round()),
+                        theme.colorScheme.secondary.withAlpha((0.05 * 255).round()),
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -173,7 +173,7 @@ class _TodayScreenEnhancedState extends ConsumerState<TodayScreenEnhanced>
                       Text(
                         _getMotivationalQuote(),
                         style: theme.textTheme.bodyLarge?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                          color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
                         ),
                       ),
                     ],
@@ -201,7 +201,7 @@ class _TodayScreenEnhancedState extends ConsumerState<TodayScreenEnhanced>
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: theme.colorScheme.primary.withOpacity(0.2),
+                      color: theme.colorScheme.primary.withAlpha((0.2 * 255).round()),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -225,7 +225,7 @@ class _TodayScreenEnhancedState extends ConsumerState<TodayScreenEnhanced>
                             Text(
                               '$_completedTasks of $_totalTasks tasks completed',
                               style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurface.withOpacity(0.7),
+                                color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
                               ),
                             ),
                           ],
@@ -239,7 +239,7 @@ class _TodayScreenEnhancedState extends ConsumerState<TodayScreenEnhanced>
                               CircularProgressIndicator(
                                 value: _progressPercentage,
                                 strokeWidth: 8,
-                                backgroundColor: theme.colorScheme.surface.withOpacity(0.3),
+                                backgroundColor: theme.colorScheme.surface.withAlpha((0.3 * 255).round()),
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   theme.colorScheme.primary,
                                 ),
@@ -262,7 +262,7 @@ class _TodayScreenEnhancedState extends ConsumerState<TodayScreenEnhanced>
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.2),
+                          color: Colors.green.withAlpha((0.2 * 255).round()),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -352,7 +352,7 @@ class _TodayScreenEnhancedState extends ConsumerState<TodayScreenEnhanced>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
+                color: color.withAlpha((0.2 * 255).round()),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: color, size: 20),
@@ -380,8 +380,8 @@ class _TodayScreenEnhancedState extends ConsumerState<TodayScreenEnhanced>
         borderRadius: BorderRadius.circular(16),
                 border: Border.all(
           color: task.status == TaskStatus.completed
-              ? Colors.green.withOpacity(0.3)
-              : categoryColor.withOpacity(0.3),
+              ? Colors.green.withAlpha((0.3 * 255).round())
+              : categoryColor.withAlpha((0.3 * 255).round()),
         ),
       ),
       child: Material(
@@ -438,7 +438,7 @@ class _TodayScreenEnhancedState extends ConsumerState<TodayScreenEnhanced>
                         Text(
                           task.description!,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.7),
+                            color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
                             decoration: task.status == TaskStatus.completed
                                 ? TextDecoration.lineThrough
                                 : null,
@@ -454,7 +454,7 @@ class _TodayScreenEnhancedState extends ConsumerState<TodayScreenEnhanced>
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: categoryColor.withOpacity(0.2),
+                              color: categoryColor.withAlpha((0.2 * 255).round()),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -508,6 +508,8 @@ class _TodayScreenEnhancedState extends ConsumerState<TodayScreenEnhanced>
         return Colors.green;
       case TaskCategory.study:
         return Colors.orange;
+      case TaskCategory.others:
+        return Colors.grey;
     }
   }
 

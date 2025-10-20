@@ -102,10 +102,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       color: theme.colorScheme.onSurface,
                     ),
                   ),
-                  Text(
+                    Text(
                     today,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
                     ),
                   ),
                 ],
@@ -114,10 +114,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 IconButton(
                   icon: const Icon(Icons.search),
                   onPressed: () async {
+                    final localContext = context;
                     await _hapticService.lightImpact();
                     if (!mounted) return;
                     showSearch(
-                      context: context,
+                      context: localContext,
                       delegate: TaskSearchDelegate(tasks),
                     );
                   },
@@ -142,32 +143,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                         tasks: tasks,
                         progress: progress,
                       ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Stats Overview Row
-                    Row(
-                      children: [
-                        Expanded(
-                          child: AnimatedStatCard(
-                            title: 'Completed',
-                            value: '$completedTasks/${tasks.length}',
-                            icon: Icons.check_circle,
-                            color: const Color(0xFF10B981),
-                            progress: progress,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: AnimatedStatCard(
-                            title: 'Streak',
-                            value: '${tasks.where((t) => t.status == TaskStatus.completed).length}',
-                            icon: Icons.local_fire_department,
-                            color: const Color(0xFFF59E0B),
-                            subtitle: 'days',
-                          ),
-                        ),
-                      ],
                     ),
                     const SizedBox(height: 12),
                     Row(
@@ -374,25 +349,25 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                 task.status == TaskStatus.completed ? 'Mark Incomplete' : 'Mark Complete',
               ),
               onTap: () async {
+                final localContext = context;
                 await _hapticService.success();
-                task.status = task.status == TaskStatus.completed 
-                    ? TaskStatus.pending 
+                task.status = task.status == TaskStatus.completed
+                    ? TaskStatus.pending
                     : TaskStatus.completed;
                 notifier.updateTask(task);
                 if (task.status == TaskStatus.completed) {
                   _confettiController.play();
                 }
-                Navigator.pop(context);
-                
+                Navigator.pop(localContext);
+
                 // Show snackbar
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(localContext).showSnackBar(
                     SnackBar(
                       content: Text(
-                        task.status == TaskStatus.completed 
-                            ? 'Task completed! 🎉' 
-                            : 'Task marked incomplete'
-                      ),
+                        task.status == TaskStatus.completed
+                            ? 'Task completed! 🎉'
+                            : 'Task marked incomplete'),
                       duration: const Duration(seconds: 2),
                       behavior: SnackBarBehavior.floating,
                     ),
@@ -404,24 +379,29 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               leading: const Icon(Icons.edit, color: Colors.blue),
               title: const Text('Edit Task'),
               onTap: () async {
+                final localContext = context;
                 await _hapticService.lightImpact();
-                Navigator.pop(context);
-                _editTask(context, task, notifier);
+                if (!mounted) return;
+                Navigator.pop(localContext);
+                _editTask(localContext, task, notifier);
               },
             ),
             ListTile(
               leading: const Icon(Icons.access_time, color: Colors.orange),
               title: const Text('Change Time'),
               onTap: () async {
+                final localContext = context;
                 await _hapticService.lightImpact();
-                Navigator.pop(context);
-                _changeTaskTime(context, task, notifier);
+                if (!mounted) return;
+                Navigator.pop(localContext);
+                _changeTaskTime(localContext, task, notifier);
               },
             ),
             ListTile(
               leading: const Icon(Icons.copy, color: Colors.purple),
               title: const Text('Duplicate Task'),
               onTap: () async {
+                final localContext = context;
                 await _hapticService.lightImpact();
                 final duplicatedTask = Task(
                   id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -433,10 +413,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                   status: TaskStatus.pending,
                 );
                 notifier.addTask(duplicatedTask);
-                Navigator.pop(context);
-                
+                Navigator.pop(localContext);
+
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  ScaffoldMessenger.of(localContext).showSnackBar(
                     const SnackBar(
                       content: Text('Task duplicated'),
                       duration: Duration(seconds: 2),
@@ -451,9 +431,11 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               leading: const Icon(Icons.delete, color: Colors.red),
               title: const Text('Delete Task', style: TextStyle(color: Colors.red)),
               onTap: () async {
+                final localContext = context;
                 await _hapticService.warning();
-                Navigator.pop(context);
-                _deleteTask(context, task, notifier);
+                if (!mounted) return;
+                Navigator.pop(localContext);
+                _deleteTask(localContext, task, notifier);
               },
             ),
           ],
@@ -466,9 +448,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     _hapticService.lightImpact();
     final titleController = TextEditingController();
     final descriptionController = TextEditingController();
-    TaskCategory selectedCategory = TaskCategory.personal;
-    TimeOfDay selectedStartTime = TimeOfDay.now();
-    TimeOfDay selectedEndTime = TimeOfDay(hour: TimeOfDay.now().hour + 1, minute: TimeOfDay.now().minute);
+  TaskCategory selectedCategory = TaskCategory.personal;
+  TimeOfDay selectedStartTime = TimeOfDay.now();
+  TimeOfDay selectedEndTime = TimeOfDay(hour: (TimeOfDay.now().hour + 1) % 24, minute: TimeOfDay.now().minute);
+  int selectedDuration = 60;
 
     showDialog(
       context: context,
@@ -521,6 +504,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     );
                   }).toList(),
                   onChanged: (value) => setDialogState(() => selectedCategory = value!),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const Expanded(child: Text('Estimated duration')),
+                    const SizedBox(width: 8),
+                    DropdownButton<int>(
+                      value: selectedDuration,
+                      items: const [15, 30, 45, 60, 90, 120].map((m) => DropdownMenuItem(value: m, child: Text('\${m}m'))).toList(),
+                      onChanged: (v) => setDialogState(() => selectedDuration = v ?? 60),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -598,6 +593,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       selectedEndTime.hour,
                       selectedEndTime.minute,
                     ),
+                          estimatedDurationMinutes: selectedDuration,
                   );
                   notifier.addTask(newTask);
                   _hapticService.success();
@@ -627,6 +623,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
     TaskCategory selectedCategory = task.category;
     TimeOfDay selectedStartTime = TimeOfDay.fromDateTime(task.startTime);
     TimeOfDay selectedEndTime = TimeOfDay.fromDateTime(task.endTime);
+  int selectedDuration = task.estimatedDurationMinutes;
 
     showDialog(
       context: context,
@@ -679,6 +676,18 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                     );
                   }).toList(),
                   onChanged: (value) => setDialogState(() => selectedCategory = value!),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const Expanded(child: Text('Estimated duration')),
+                    const SizedBox(width: 8),
+                    DropdownButton<int>(
+                      value: selectedDuration,
+                      items: const [15, 30, 45, 60, 90, 120].map((m) => DropdownMenuItem(value: m, child: Text('\${m}m'))).toList(),
+                      onChanged: (v) => setDialogState(() => selectedDuration = v ?? 60),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -755,6 +764,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                       selectedEndTime.hour,
                       selectedEndTime.minute,
                     ),
+                          estimatedDurationMinutes: selectedDuration,
                     status: task.status,
                   );
                   notifier.updateTask(updatedTask);
@@ -927,6 +937,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         return Icons.fitness_center;
       case TaskCategory.study:
         return Icons.school;
+      case TaskCategory.others:
+        return Icons.more_horiz;
     }
   }
 
@@ -940,6 +952,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         return Colors.green;
       case TaskCategory.study:
         return Colors.purple;
+      case TaskCategory.others:
+        return Colors.grey;
     }
   }
 
@@ -993,7 +1007,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
         Text(
           subtitle,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurface.withOpacity(0.7),
+            color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
           ),
         ),
         const SizedBox(height: 16),
@@ -1055,7 +1069,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                           Text(
                             '${task.startTime.hour}:${task.startTime.minute.toString().padLeft(2, '0')}',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface.withOpacity(0.6),
+                              color: theme.colorScheme.onSurface.withAlpha((0.6 * 255).round()),
                             ),
                           ),
                         ],
