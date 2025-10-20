@@ -68,7 +68,7 @@ class TaskListScreen extends ConsumerWidget {
                     title: Text(t.title),
                     subtitle: t.description != null ? Text(t.description!) : null,
                     leading: CircleAvatar(
-                      backgroundColor: t.categoryColor.withOpacity(0.12),
+                      backgroundColor: t.categoryColor.withAlpha((0.12 * 255).round()),
                       child: Icon(t.categoryIcon, color: t.categoryColor),
                     ),
                     trailing: Text(t.status.toString().split('.').last),

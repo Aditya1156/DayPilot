@@ -505,9 +505,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.primaryColor.withOpacity(0.8),
-              AppColors.secondaryColor.withOpacity(0.8),
-              AppColors.accentColor.withOpacity(0.6),
+              AppColors.primaryColor.withAlpha((0.8 * 255).round()),
+              AppColors.secondaryColor.withAlpha((0.8 * 255).round()),
+              AppColors.accentColor.withAlpha((0.6 * 255).round()),
             ],
           ),
         ),
@@ -556,7 +556,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withAlpha((0.2 * 255).round()),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -588,11 +588,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     return Container(
       constraints: const BoxConstraints(maxWidth: 400),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.95),
+  color: Colors.white.withAlpha((0.95 * 255).round()),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha((0.1 * 255).round()),
             blurRadius: 30,
             offset: const Offset(0, 15),
           ),
@@ -721,7 +721,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   ),
                   elevation: 0,
                   disabledBackgroundColor:
-                      AppColors.primaryColor.withOpacity(0.6),
+                      AppColors.primaryColor.withAlpha((0.6 * 255).round()),
                 ),
                 child: _isLoading
                     ? Row(
@@ -833,18 +833,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         children: [
           Row(
             children: [
-              Expanded(child: Divider(color: Colors.white.withOpacity(0.5))),
+              Expanded(child: Divider(color: Colors.white.withAlpha((0.5 * 255).round()))),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
                   'OR',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withAlpha((0.8 * 255).round()),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-              Expanded(child: Divider(color: Colors.white.withOpacity(0.5))),
+              Expanded(child: Divider(color: Colors.white.withAlpha((0.5 * 255).round()))),
             ],
           ),
           const SizedBox(height: 24),

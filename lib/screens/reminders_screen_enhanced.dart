@@ -159,7 +159,7 @@ class _RemindersScreenEnhancedState extends ConsumerState<RemindersScreenEnhance
                     shape: BoxShape.circle,
                   ),
                   todayDecoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.3),
+                    color: theme.colorScheme.primary.withAlpha((0.3 * 255).round()),
                     shape: BoxShape.circle,
                   ),
                   markerDecoration: BoxDecoration(
@@ -199,7 +199,7 @@ class _RemindersScreenEnhancedState extends ConsumerState<RemindersScreenEnhance
                         ),
                         selected: false,
                         onSelected: (_) => _haptic.lightImpact(),
-                        selectedColor: category.color.withOpacity(0.2),
+                        selectedColor: category.color.withAlpha((0.2 * 255).round()),
                       ),
                     );
                   }).toList(),
@@ -249,13 +249,13 @@ class _RemindersScreenEnhancedState extends ConsumerState<RemindersScreenEnhance
                       Icon(
                         Icons.event_available,
                         size: 64,
-                        color: theme.colorScheme.onSurface.withOpacity(0.3),
+                        color: theme.colorScheme.onSurface.withAlpha((0.3 * 255).round()),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         'All clear for this day!',
                         style: theme.textTheme.titleMedium?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.5),
+                          color: theme.colorScheme.onSurface.withAlpha((0.5 * 255).round()),
                         ),
                       ),
                     ],
@@ -312,15 +312,15 @@ class _RemindersScreenEnhancedState extends ConsumerState<RemindersScreenEnhance
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            category.color.withOpacity(0.1),
-            category.color.withOpacity(0.05),
+            category.color.withAlpha((0.1 * 255).round()),
+            category.color.withAlpha((0.05 * 255).round()),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: category.color.withOpacity(0.3),
+          color: category.color.withAlpha((0.3 * 255).round()),
           width: 1,
         ),
       ),
@@ -360,7 +360,7 @@ class _RemindersScreenEnhancedState extends ConsumerState<RemindersScreenEnhance
                         Text(
                           reminder.description!,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.7),
+                            color: theme.colorScheme.onSurface.withAlpha((0.7 * 255).round()),
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -391,7 +391,7 @@ class _RemindersScreenEnhancedState extends ConsumerState<RemindersScreenEnhance
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.2),
+                                color: Colors.red.withAlpha((0.2 * 255).round()),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Text(

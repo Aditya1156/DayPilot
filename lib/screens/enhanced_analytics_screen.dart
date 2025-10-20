@@ -67,7 +67,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -294,7 +294,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: gradient.colors[0].withOpacity(0.3),
+            color: gradient.colors[0].withAlpha((0.3 * 255).round()),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -317,7 +317,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withAlpha((0.9 * 255).round()),
               fontSize: 14,
             ),
           ),
@@ -335,7 +335,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -391,7 +391,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -449,7 +449,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -487,7 +487,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
           borderRadius: BorderRadius.circular(10),
           child: LinearProgressIndicator(
             value: percentage,
-            backgroundColor: color.withOpacity(0.1),
+            backgroundColor: color.withAlpha((0.1 * 255).round()),
             valueColor: AlwaysStoppedAnimation(color),
             minHeight: 10,
           ),
@@ -505,7 +505,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -550,8 +550,8 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
                 show: true,
                 gradient: LinearGradient(
                   colors: [
-                    ModernTheme.primaryPurple.withOpacity(0.3),
-                    ModernTheme.primaryBlue.withOpacity(0.1),
+                    ModernTheme.primaryPurple.withAlpha((0.3 * 255).round()),
+                    ModernTheme.primaryBlue.withAlpha((0.1 * 255).round()),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -572,7 +572,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -604,7 +604,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: ModernTheme.successGreen.withOpacity(0.2 + intensity * 0.2),
+                      color: ModernTheme.successGreen.withAlpha(((0.2 + intensity * 0.2) * 255).round()),
                       borderRadius: BorderRadius.circular(8),
                     ),
                   );
@@ -627,7 +627,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: ModernTheme.warningOrange.withOpacity(0.3),
+            color: ModernTheme.warningOrange.withAlpha((0.3 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -639,7 +639,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withAlpha((0.3 * 255).round()),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.local_fire_department, color: Colors.white, size: 32),
@@ -661,7 +661,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
                 Text(
                   'Keep it going! You\'re on fire 🔥',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withAlpha((0.9 * 255).round()),
                     fontSize: 14,
                   ),
                 ),
@@ -681,7 +681,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: gradient.colors[0].withOpacity(0.3),
+            color: gradient.colors[0].withAlpha((0.3 * 255).round()),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -702,7 +702,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
           Text(
             description,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withAlpha((0.9 * 255).round()),
               fontSize: 14,
               height: 1.5,
             ),
@@ -720,7 +720,7 @@ class _EnhancedAnalyticsScreenState extends ConsumerState<EnhancedAnalyticsScree
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
