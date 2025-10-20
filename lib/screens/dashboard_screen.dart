@@ -270,51 +270,114 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
           // ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: (index) {
-          switch (index) {
-            case 1:
-              Navigator.pushNamed(context, '/routines');
-              break;
-            case 2:
-              Navigator.pushNamed(context, '/reminders');
-              break;
-            case 3:
-              Navigator.pushNamed(context, '/ai-assistant');
-              break;
-            case 4:
-              Navigator.pushNamed(context, '/analytics-enhanced');
-              break;
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Today',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha((0.1 * 255).round()),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          child: BottomNavigationBar(
+            currentIndex: 0,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: theme.colorScheme.surface,
+            selectedItemColor: AppTheme.primaryPeach,
+            unselectedItemColor: theme.colorScheme.onSurface.withAlpha((0.5 * 255).round()),
+            selectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontSize: 11,
+            ),
+            elevation: 0,
+            onTap: (index) async {
+              await _hapticService.lightImpact();
+              switch (index) {
+                case 0:
+                  // Already on Today/Dashboard
+                  break;
+                case 1:
+                  Navigator.pushNamed(context, '/routines');
+                  break;
+                case 2:
+                  Navigator.pushNamed(context, '/reminders');
+                  break;
+                case 3:
+                  Navigator.pushNamed(context, '/ai');
+                  break;
+                case 4:
+                  Navigator.pushNamed(context, '/analytics');
+                  break;
+              }
+            },
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_rounded),
+                activeIcon: Icon(Icons.home),
+                label: 'Today',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.calendar_today_rounded),
+                activeIcon: Icon(Icons.calendar_today),
+                label: 'Routines',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.notifications_outlined),
+                activeIcon: Icon(Icons.notifications),
+                label: 'Reminders',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.psychology_outlined),
+                activeIcon: Icon(Icons.psychology),
+                label: 'AI',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.analytics_outlined),
+                activeIcon: Icon(Icons.analytics),
+                label: 'Analytics',
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Routines',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Reminders',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.psychology),
-            label: 'AI',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.analytics),
-            label: 'Analytics',
-          ),
-        ],
+        ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _addNewTask(context, tasksNotifier),
-        child: const Icon(Icons.add),
+      floatingActionButton: Container(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: const LinearGradient(
+            colors: [AppTheme.primaryPeach, AppTheme.accentBeige],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primaryPeach.withAlpha((0.5 * 255).round()),
+              blurRadius: 20,
+              spreadRadius: 2,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          onPressed: () async {
+            await _hapticService.mediumImpact();
+            _addNewTask(context, tasksNotifier);
+          },
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: const Icon(
+            Icons.add_rounded,
+            size: 32,
+            color: Colors.white,
+          ),
+        ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
@@ -978,7 +1041,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withAlpha((0.1 * 255).round()),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -994,7 +1057,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
                   Text(
                     '$completedCount/${tasks.length}',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: color.withOpacity(0.8),
+                      color: color.withAlpha((0.8 * 255).round()),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -1102,14 +1165,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> with TickerPr
               Icon(
                 Icons.task_alt,
                 size: 64,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                color: Theme.of(context).colorScheme.onSurface.withAlpha((0.3 * 255).round()),
               ),
               const SizedBox(height: 16),
               Text(
                 'No tasks yet!\nTap + to add your first task',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withAlpha((0.6 * 255).round()),
                 ),
               ),
             ],

@@ -130,7 +130,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
+                                color: Colors.black.withAlpha((0.2 * 255).round()),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),
@@ -174,7 +174,7 @@ class _UsernameSetupScreenState extends ConsumerState<UsernameSetupScreen>
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withAlpha((0.1 * 255).round()),
                                 blurRadius: 20,
                                 offset: const Offset(0, 10),
                               ),

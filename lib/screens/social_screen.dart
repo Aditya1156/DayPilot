@@ -21,7 +21,7 @@ class SocialScreen extends StatelessWidget {
               Icon(
                 Icons.people,
                 size: 100,
-                color: Colors.pink.withOpacity(0.5),
+                color: Colors.pink.withAlpha((0.5 * 255).round()),
               ),
               const SizedBox(height: 24),
               const Text(

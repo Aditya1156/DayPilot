@@ -238,7 +238,7 @@ class _RoutineBuilderScreenState extends State<RoutineBuilderScreen> {
                             duration: const Duration(milliseconds: 220),
                             curve: Curves.easeOutCubic,
                             decoration: BoxDecoration(
-                              color: isActive ? theme.colorScheme.primary.withOpacity(0.03) : Colors.transparent,
+                              color: isActive ? theme.colorScheme.primary.withAlpha((0.03 * 255).round()) : Colors.transparent,
                               borderRadius: BorderRadius.circular(12),
                               border: isActive ? Border.all(color: theme.colorScheme.primary, width: 2) : Border.all(color: Colors.transparent),
                             ),

@@ -252,7 +252,7 @@ class _VoiceCommandsScreenState extends ConsumerState<VoiceCommandsScreen>
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -440,7 +440,7 @@ class _VoiceCommandsScreenState extends ConsumerState<VoiceCommandsScreen>
                 border: Border.all(color: cmd['color'].withOpacity(0.3)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black.withAlpha((0.05 * 255).round()),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -486,7 +486,7 @@ class _VoiceCommandsScreenState extends ConsumerState<VoiceCommandsScreen>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha((0.05 * 255).round()),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
